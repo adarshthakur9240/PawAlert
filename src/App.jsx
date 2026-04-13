@@ -81,7 +81,7 @@ const App = () => {
       </main>
 
       {/* GLOBAL FOOTER */}
-      <AppDownload />
+      {location.pathname === "/" && <AppDownload />}
       {showFooter && <Footer />}
     </div>
   );
