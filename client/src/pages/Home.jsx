@@ -7,7 +7,6 @@ const Home = () => {
     <div className="bg-[#050505] min-h-screen overflow-x-hidden font-sans">
       <Hero />
       <AboutSection />
-      {/* Agar Features.jsx missing hai toh ye line error degi, isliye abhi hata di hai */}
     </div>
   );
 };
