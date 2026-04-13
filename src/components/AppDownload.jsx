@@ -22,7 +22,7 @@ const AppDownload = () => {
             <BellRing size={12} /> Stay Alert, Save Lives
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight italic tracking-tighter">
+          <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight  tracking-tighter">
             Download <span className="text-orange-600">PawAlert</span> App
           </h2>
 

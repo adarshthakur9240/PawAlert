@@ -34,12 +34,12 @@ const Home = () => {
       <section className="animate-gradient relative flex flex-col items-center pt-44 md:pt-56 pb-32 px-6 overflow-hidden min-h-screen justify-start">
         <div className="flex flex-col items-center text-center z-10">
           {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold mb-8 animate-pulse">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-black mb-8 animate-pulse">
             <Heart size={14} fill="currentColor" /> Helping 1000+ Strays Daily
           </div>
 
           {/* Headline - Italic & Bold Combo */}
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter max-w-5xl leading-[1.1] text-white italic">
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter max-w-5xl leading-[1.1] text-white ">
             Empower Your Rescue <br /> with{" "}
             <span className="text-orange-500 drop-shadow-[0_0_30px_rgba(234,88,12,0.3)]">
               Next-Gen Tools
@@ -75,7 +75,7 @@ const Home = () => {
             <div className="text-xl font-black tracking-tighter opacity-80">
               🏛️ GOI
             </div>
-            <div className="text-xl font-black italic tracking-tighter underline decoration-orange-500 decoration-2 underline-offset-4">
+            <div className="text-xl font-black  tracking-tighter underline decoration-orange-500 decoration-2 underline-offset-4">
               NGO Network
             </div>
             <div className="text-xl font-black tracking-tighter opacity-80">

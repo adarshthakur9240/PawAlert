@@ -1176,7 +1176,7 @@ const Dashboard = () => {
               style={{
                 fontSize: "18px",
                 color: "#888",
-                fontStyle: "italic",
+                fontStyle: "",
                 margin: "0 0 10px",
               }}
             >
@@ -1185,7 +1185,7 @@ const Dashboard = () => {
             <h2
               style={{
                 fontSize: "68px",
-                fontStyle: "italic",
+                fontStyle: "",
                 color: "#D4762A",
                 borderBottom: "3px solid #eee",
                 display: "inline-block",

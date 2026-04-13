@@ -22,8 +22,8 @@ const RescuedGallery = () => {
   return (
     <section className="bg-[#020617] py-24 px-6 border-t border-white/5">
       <div className="max-w-7xl mx-auto text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight italic">
-          Our <span className="text-orange-500 font-serif">Rescued Heroes</span>
+        <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight ">
+          Our <span className="text-orange-500 font-outfit">Rescued Heroes</span>
         </h2>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
           Every image tells a story of survival and hope. Hover over them to see
@@ -48,7 +48,7 @@ const RescuedGallery = () => {
 
             {/* Text Overlay - Only visible when expanded */}
             <div className="absolute inset-0 flex flex-col justify-end p-10 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-              <h3 className="text-3xl font-black text-white mb-2 italic tracking-tighter decoration-orange-500 underline decoration-2 underline-offset-8">
+              <h3 className="text-3xl font-black text-white mb-2  tracking-tighter decoration-orange-500 underline decoration-2 underline-offset-8">
                 {pet.title}
               </h3>
               <p className="text-gray-200 text-sm leading-relaxed max-w-sm mt-4 font-medium backdrop-blur-md bg-black/30 p-4 rounded-2xl border border-white/5">

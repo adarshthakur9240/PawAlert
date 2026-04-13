@@ -91,14 +91,14 @@ export default function Register() {
           </select>
 
           <button type="submit" disabled={loading}
-            className="py-4 mt-4 font-bold w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50">
+            className="py-4 mt-4 font-black w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50">
             {loading ? "Creating account..." : "Join Tribe 🐾"}
           </button>
         </form>
 
         <p className="mt-8 text-center text-sm text-zinc-400">
           Already a savior?{" "}
-          <Link to="/login" className="text-orange-500 font-bold hover:underline">Login here</Link>
+          <Link to="/login" className="text-orange-500 font-black hover:underline">Login here</Link>
         </p>
       </div>
     </div>

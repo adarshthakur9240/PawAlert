@@ -114,7 +114,7 @@ const Testimonials = () => {
                   key={idx}
                   className="rescue-card p-8 rounded-3xl transition-all duration-300"
                 >
-                  <p className="text-gray-400 text-[15px] leading-relaxed mb-8 italic">
+                  <p className="text-gray-400 text-[15px] leading-relaxed mb-8 ">
                     "{story.description}"
                   </p>
                   <div className="flex items-center gap-4">
@@ -124,7 +124,7 @@ const Testimonials = () => {
                       alt={story.name}
                     />
                     <div>
-                      <h4 className="text-white font-bold text-sm tracking-wide">
+                      <h4 className="text-white font-black text-sm tracking-wide">
                         {story.name}
                       </h4>
                       <p className="text-xs text-orange-500/70 font-medium">

@@ -69,13 +69,13 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6 border-l border-gray-500/20 pl-6">
           <Link
             to="/dashboard"
-            className={`font-bold text-xs uppercase tracking-widest ${shouldShowSolid ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+            className={`font-black text-xs uppercase tracking-widest ${shouldShowSolid ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
           >
             Dashboard
           </Link>
           <Link
             to="/support"
-            className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-widest text-orange-500 hover:scale-105 transition-transform"
+            className="flex items-center gap-1.5 font-black text-xs uppercase tracking-widest text-orange-500 hover:scale-105 transition-transform"
           >
             <Heart size={14} fill="currentColor" /> Donate
           </Link>
@@ -93,7 +93,7 @@ const Navbar = () => {
               {user.role || "ADMIN"}
             </span>
             <p
-              className={`text-xs font-bold ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
+              className={`text-xs font-black ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
             >
               {user.name}
             </p>
