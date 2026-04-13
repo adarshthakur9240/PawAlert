@@ -18,7 +18,7 @@ export default function Register() {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    // In future: Add API call here
+    console.log("Welcome to the Tribe! Redirecting...");
     navigate("/dashboard");
   };
 
@@ -45,6 +45,7 @@ export default function Register() {
                 type="text"
                 placeholder="Full Name"
                 className="py-3.5 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 pl-12 pr-5 text-white focus:ring-2 focus:ring-orange-500/50 focus:outline-none"
+                required
               />
             </div>
 
@@ -57,6 +58,7 @@ export default function Register() {
                 type="tel"
                 placeholder="Mobile Number"
                 className="py-3.5 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 pl-12 pr-24 text-white focus:ring-2 focus:ring-orange-500/50 focus:outline-none"
+                required
               />
               <button
                 type="button"
@@ -72,7 +74,7 @@ export default function Register() {
             <input
               type="text"
               placeholder="Enter 6-digit OTP"
-              className="py-3.5 w-full rounded-2xl border border-orange-500/30 bg-orange-500/5 px-5 text-white placeholder-orange-500/30 focus:ring-2 focus:ring-orange-500 focus:outline-none animate-pulse"
+              className="py-3.5 w-full rounded-2xl border border-orange-500/30 bg-orange-500/5 px-5 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none animate-pulse"
             />
           )}
 
@@ -82,6 +84,7 @@ export default function Register() {
               type="email"
               placeholder="Email Address"
               className="py-3.5 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 pl-12 pr-5 text-white focus:ring-2 focus:ring-orange-500/50 focus:outline-none"
+              required
             />
           </div>
 
@@ -95,6 +98,7 @@ export default function Register() {
                 type={showPass ? "text" : "password"}
                 placeholder="Password"
                 className="py-3.5 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 pl-12 pr-12 text-white focus:ring-2 focus:ring-orange-500/50 focus:outline-none"
+                required
               />
               <button
                 type="button"
@@ -113,6 +117,7 @@ export default function Register() {
                 type="password"
                 placeholder="Confirm"
                 className="py-3.5 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 pl-12 pr-5 text-white focus:ring-2 focus:ring-orange-500/50 focus:outline-none"
+                required
               />
             </div>
           </div>

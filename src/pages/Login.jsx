@@ -6,11 +6,13 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    console.log("Login Success! Redirecting...");
     navigate("/dashboard");
   };
 
   return (
     <div className="flex h-screen w-full bg-[#050505] font-['Inter']">
+      {/* LEFT SIDE: PawAlert Theme Image */}
       <div className="w-full hidden md:block relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#050505] to-transparent z-10" />
         <img
@@ -30,6 +32,7 @@ export default function Login() {
         </div>
       </div>
 
+      {/* RIGHT SIDE: Login Form */}
       <div className="w-full flex flex-col items-center justify-center p-8 lg:p-16">
         <form
           onSubmit={handleLogin}
@@ -42,6 +45,7 @@ export default function Login() {
             Welcome back, Savior! Rescue missions await.
           </p>
 
+          {/* SOCIAL LOGINS */}
           <div className="grid grid-cols-2 gap-4 mt-8">
             <button
               type="button"
