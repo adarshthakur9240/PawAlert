@@ -1,9 +1,7 @@
 import axios from "axios";
 
-// client/src/configs/api.js
-const api = axios.create({
-  baseURL: "http://localhost:5001", // Isse bhi 5001 kar do
-  withCredentials: true,
+const API = axios.create({ 
+  baseURL: "https://pawalert-j5al.onrender.com/api" 
 });
 
-export default api;
+export default API;
