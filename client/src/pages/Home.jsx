@@ -4,7 +4,7 @@ import AboutSection from "../components/AboutSection";
 
 const Home = () => {
   return (
-    <div className="bg-[#050505] min-h-screen overflow-x-hidden">
+    <div className="bg-[#050505] min-h-screen overflow-x-hidden font-sans">
       <Hero />
       <AboutSection />
     </div>
