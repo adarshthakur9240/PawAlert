@@ -16,7 +16,6 @@ import {
   Loader2,
   Trophy,
   MapPin,
-
   Sun,
   Moon,
   Heart,
@@ -24,7 +23,6 @@ import {
   Edit2,
   ShieldCheck,
   Crown,
-
   Sparkles,
   HeartPulse,
   AlertCircle,
@@ -301,12 +299,10 @@ const Dashboard = () => {
     >
       <Navbar />
 
-      {/* 🔥 SUB-NAV HAS BEEN REMOVED FOR CLEANER INTERFACE 🔥 */}
-
       <div
         style={{
           maxWidth: "1260px",
-          margin: "110px auto 40px", // Margin adjusted from 160px to 110px
+          margin: "110px auto 40px",
           padding: "0 20px",
         }}
       >
@@ -599,7 +595,6 @@ const Dashboard = () => {
                   <div
                     style={{ display: "flex", gap: "8px", marginTop: "12px" }}
                   >
-                    {/* Edit Button — visible to all except plain user */}
                     {canEdit && (
                       <button
                         onClick={() => handleEditClick(report)}
@@ -621,7 +616,6 @@ const Dashboard = () => {
                       </button>
                     )}
 
-                    {/* Stage 1: RESCUE — GOI/Admin only */}
                     {report.status === "pending" && isGov && (
                       <button
                         onClick={() => updateStatus(report._id, "rescued")}
@@ -641,7 +635,6 @@ const Dashboard = () => {
                       </button>
                     )}
 
-                    {/* Stage 2: SHELTER — NGO/Admin only */}
                     {report.status === "rescued" && isNGO && (
                       <button
                         onClick={() => updateStatus(report._id, "sheltered")}
@@ -661,7 +654,6 @@ const Dashboard = () => {
                       </button>
                     )}
 
-                    {/* Stage 3: ADOPT or ZOO — NGO/Admin only */}
                     {report.status === "sheltered" && isNGO && (
                       <>
                         <button
@@ -699,7 +691,6 @@ const Dashboard = () => {
                       </>
                     )}
 
-                    {/* Failed — Admin only */}
                     {isAdmin && report.status === "pending" && (
                       <button
                         onClick={() => updateStatus(report._id, "failed")}
@@ -1129,8 +1120,9 @@ const Dashboard = () => {
               </p>
             </div>
             <div style={{ textAlign: "right" }}>
+              {/* ✅ FIXED: Replaced Wikimedia link with local ashok.png to avoid 429 status */}
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png"
+                src="/ashok.png"
                 style={{
                   width: "65px",
                   marginLeft: "auto",
@@ -1138,6 +1130,7 @@ const Dashboard = () => {
                   marginBottom: "6px",
                 }}
                 crossOrigin="anonymous"
+                alt="Ashok Emblem"
               />
               <p
                 style={{
