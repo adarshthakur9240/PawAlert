@@ -1,3 +1,4 @@
+import AboutSection from "../components/AboutSection";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Testimonials from "../components/Testimonials";
