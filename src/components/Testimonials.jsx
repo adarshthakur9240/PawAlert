@@ -88,7 +88,7 @@ const Testimonials = () => {
 
       {/* Header */}
       <div className="max-w-7xl mx-auto text-center mb-16">
-        <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+        <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
           People <span className="text-orange-500">Love Us</span>
         </h2>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">
@@ -124,7 +124,7 @@ const Testimonials = () => {
                       alt={story.name}
                     />
                     <div>
-                      <h4 className="text-white font-black text-sm tracking-wide">
+                      <h4 className="text-white font-extrabold text-sm tracking-wide">
                         {story.name}
                       </h4>
                       <p className="text-xs text-orange-500/70 font-medium">

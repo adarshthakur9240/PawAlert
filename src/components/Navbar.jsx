@@ -60,7 +60,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <Zap size={28} className="text-orange-500 fill-orange-500" />
           <span
-            className={`text-2xl font-black tracking-tighter ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
+            className={`text-2xl font-extrabold tracking-tighter ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
           >
             PawAlert
           </span>
@@ -69,13 +69,13 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6 border-l border-gray-500/20 pl-6">
           <Link
             to="/dashboard"
-            className={`font-black text-xs uppercase tracking-widest ${shouldShowSolid ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+            className={`font-extrabold text-xs uppercase tracking-widest ${shouldShowSolid ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
           >
             Dashboard
           </Link>
           <Link
             to="/support"
-            className="flex items-center gap-1.5 font-black text-xs uppercase tracking-widest text-orange-500 hover:scale-105 transition-transform"
+            className="flex items-center gap-1.5 font-extrabold text-xs uppercase tracking-widest text-orange-500 hover:scale-105 transition-transform"
           >
             <Heart size={14} fill="currentColor" /> Donate
           </Link>
@@ -88,12 +88,12 @@ const Navbar = () => {
         {user && (
           <div className="hidden sm:flex flex-col items-end leading-none mr-2">
             <span
-              className={`text-[9px] font-black px-2 py-0.5 rounded border border-orange-500/30 text-orange-500 bg-orange-500/10 uppercase tracking-tighter mb-1`}
+              className={`text-[9px] font-extrabold px-2 py-0.5 rounded border border-orange-500/30 text-orange-500 bg-orange-500/10 uppercase tracking-tighter mb-1`}
             >
               {user.role || "ADMIN"}
             </span>
             <p
-              className={`text-xs font-black ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
+              className={`text-xs font-extrabold ${shouldShowSolid ? "text-gray-900 dark:text-white" : "text-white"}`}
             >
               {user.name}
             </p>
@@ -122,14 +122,14 @@ const Navbar = () => {
               dispatch(logout());
               navigate("/");
             }}
-            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-full font-black text-[11px] uppercase transition-all shadow-lg active:scale-95"
+            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-full font-extrabold text-[11px] uppercase transition-all shadow-lg active:scale-95"
           >
             Logout
           </button>
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="bg-orange-600 text-white px-8 py-2.5 rounded-full font-black text-xs uppercase hover:bg-orange-700 transition-all"
+            className="bg-orange-600 text-white px-8 py-2.5 rounded-full font-extrabold text-xs uppercase hover:bg-orange-700 transition-all"
           >
             Login
           </button>

@@ -18,11 +18,11 @@ const AppDownload = () => {
       <div className="max-w-7xl mx-auto bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl flex items-center min-h-[340px] relative overflow-hidden">
         {/* 📝 LEFT: Content Section */}
         <div className="w-full md:w-[65%] p-8 md:p-16 z-10 relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-500 text-[10px] font-black uppercase tracking-widest mb-4 border border-orange-500/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-500 text-[10px] font-extrabold uppercase tracking-widest mb-4 border border-orange-500/20">
             <BellRing size={12} /> Stay Alert, Save Lives
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight  tracking-tighter">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight  tracking-tighter">
             Download <span className="text-orange-600">PawAlert</span> App
           </h2>
 

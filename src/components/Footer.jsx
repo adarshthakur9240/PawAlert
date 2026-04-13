@@ -23,7 +23,7 @@ const Footer = () => {
             onClick={() => window.scrollTo(0, 0)}
           >
             <Zap size={28} className="text-orange-500 fill-orange-500" />
-            <span className="text-3xl font-black tracking-tighter">
+            <span className="text-3xl font-extrabold tracking-tighter">
               {" "}
               PawAlert{" "}
             </span>
@@ -39,7 +39,7 @@ const Footer = () => {
         <div className="flex flex-1 flex-row flex-wrap md:flex-nowrap justify-between w-full md:w-[60%] gap-8">
           {/* Column: Resources (Active Links) */}
           <div className="min-w-[120px]">
-            <h3 className="text-white font-outfit text-[20px] font-black mb-8 ">
+            <h3 className="text-white font-outfit text-[20px] font-extrabold mb-8 ">
               {" "}
               Resources{" "}
             </h3>
@@ -61,7 +61,7 @@ const Footer = () => {
 
           {/* Column: Company (Active Links) */}
           <div className="min-w-[120px]">
-            <h3 className="text-white font-outfit text-[20px] font-black mb-8 ">
+            <h3 className="text-white font-outfit text-[20px] font-extrabold mb-8 ">
               {" "}
               Company{" "}
             </h3>
@@ -83,7 +83,7 @@ const Footer = () => {
 
           {/* Column: About Developer (Linked with Icons) */}
           <div className="min-w-[200px]">
-            <h3 className="text-white font-outfit text-[20px] font-black mb-8  underline decoration-orange-500/40 underline-offset-8">
+            <h3 className="text-white font-outfit text-[20px] font-extrabold mb-8  underline decoration-orange-500/40 underline-offset-8">
               About Developer
             </h3>
             <ul className="space-y-4 text-[#94a3b8] text-[13px] font-medium">

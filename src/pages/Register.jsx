@@ -41,7 +41,7 @@ export default function Register() {
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 font-['Inter']">
       <div className="w-full max-w-lg rounded-[2.5rem] bg-[#0a0a0a] border border-zinc-800 p-10 shadow-2xl relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-500/10 blur-[80px]"></div>
-        <h1 className="mb-2 text-center text-4xl font-black text-white tracking-tight">Join the Tribe</h1>
+        <h1 className="mb-2 text-center text-4xl font-extrabold text-white tracking-tight">Join the Tribe</h1>
         <p className="mb-8 text-center text-zinc-400 text-sm font-medium">Create your profile to start saving lives.</p>
 
         <form onSubmit={handleRegister} className="space-y-4">
@@ -91,14 +91,14 @@ export default function Register() {
           </select>
 
           <button type="submit" disabled={loading}
-            className="py-4 mt-4 font-black w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50">
+            className="py-4 mt-4 font-extrabold w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50">
             {loading ? "Creating account..." : "Join Tribe 🐾"}
           </button>
         </form>
 
         <p className="mt-8 text-center text-sm text-zinc-400">
           Already a savior?{" "}
-          <Link to="/login" className="text-orange-500 font-black hover:underline">Login here</Link>
+          <Link to="/login" className="text-orange-500 font-extrabold hover:underline">Login here</Link>
         </p>
       </div>
     </div>
