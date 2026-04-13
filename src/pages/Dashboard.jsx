@@ -16,7 +16,7 @@ import {
   Loader2,
   Trophy,
   MapPin,
-  Zap,
+
   Sun,
   Moon,
   Heart,
@@ -24,7 +24,7 @@ import {
   Edit2,
   ShieldCheck,
   Crown,
-  Activity,
+
   Sparkles,
   HeartPulse,
   AlertCircle,
