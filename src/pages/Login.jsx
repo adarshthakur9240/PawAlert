@@ -6,13 +6,12 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Login Success! Redirecting...");
+    console.log("Login Success! Redirecting to dashboard...");
     navigate("/dashboard");
   };
 
   return (
     <div className="flex h-screen w-full bg-[#050505] font-['Inter']">
-      {/* LEFT SIDE: PawAlert Theme Image */}
       <div className="w-full hidden md:block relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#050505] to-transparent z-10" />
         <img
@@ -32,7 +31,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* RIGHT SIDE: Login Form */}
       <div className="w-full flex flex-col items-center justify-center p-8 lg:p-16">
         <form
           onSubmit={handleLogin}
@@ -41,11 +39,10 @@ export default function Login() {
           <h2 className="text-4xl text-white font-black tracking-tighter">
             Sign in
           </h2>
-          <p className="text-zinc-500 mt-3 font-medium">
+          <p className="text-zinc-500 mt-3 font-medium text-sm">
             Welcome back, Savior! Rescue missions await.
           </p>
 
-          {/* SOCIAL LOGINS */}
           <div className="grid grid-cols-2 gap-4 mt-8">
             <button
               type="button"
@@ -94,13 +91,13 @@ export default function Login() {
 
           <button
             type="submit"
-            className="mt-10 w-full h-14 rounded-2xl text-black bg-orange-500 font-black text-lg shadow-[0_10px_40px_rgba(249,115,22,0.2)]"
+            className="mt-10 w-full h-14 rounded-2xl text-black bg-orange-500 font-black text-lg shadow-[0_10px_40px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all"
           >
             Login to Mission 🐾
           </button>
 
           <p className="text-zinc-500 text-sm mt-6 text-center font-medium">
-            Don’t have an account?{" "}
+            Already a savior?{" "}
             <Link
               className="text-orange-500 font-bold hover:underline ml-1"
               to="/register"

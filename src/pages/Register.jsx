@@ -18,7 +18,7 @@ export default function Register() {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    console.log("Welcome to the Tribe! Redirecting...");
+    console.log("Welcome to the Tribe! Redirecting to dashboard...");
     navigate("/dashboard");
   };
 
@@ -26,7 +26,6 @@ export default function Register() {
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 font-['Inter']">
       <div className="w-full max-w-lg rounded-[2.5rem] bg-[#0a0a0a] border border-zinc-800 p-10 shadow-2xl relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-500/10 blur-[80px]"></div>
-
         <h1 className="mb-2 text-center text-4xl font-black text-white tracking-tight">
           Join the Tribe
         </h1>
@@ -48,7 +47,6 @@ export default function Register() {
                 required
               />
             </div>
-
             <div className="relative">
               <Phone
                 className="absolute left-4 top-3.5 text-zinc-600"
@@ -74,7 +72,7 @@ export default function Register() {
             <input
               type="text"
               placeholder="Enter 6-digit OTP"
-              className="py-3.5 w-full rounded-2xl border border-orange-500/30 bg-orange-500/5 px-5 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none animate-pulse"
+              className="py-3.5 w-full rounded-2xl border border-orange-500/30 bg-orange-500/5 px-5 text-white placeholder-orange-500/30 focus:ring-2 focus:ring-orange-500 focus:outline-none animate-pulse"
             />
           )}
 
@@ -130,7 +128,7 @@ export default function Register() {
 
           <button
             type="submit"
-            className="py-4 mt-4 font-bold w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)]"
+            className="py-4 mt-4 font-bold w-full rounded-2xl bg-orange-500 text-black text-lg shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:scale-[1.01] active:scale-95 transition-all"
           >
             Join Tribe 🐾
           </button>
