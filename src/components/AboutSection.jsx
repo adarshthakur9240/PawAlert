@@ -16,10 +16,10 @@ export default function AboutSection() {
               PawAlert connects citizens with local government authorities to rescue, vaccinate, and rehome stray animals across India.
             </p>
             <p className="text-zinc-400 leading-relaxed mb-4">
-              Spot a stray? Report it in seconds. Our AI-powered system analyzes the animal's condition, provides first-aid advice, and automatically notifies the right authorities.
+              Spot a stray? Report it in seconds. Our AI-powered system analyzes the animal&apos;s condition, provides first-aid advice, and automatically notifies the right authorities.
             </p>
             <p className="text-zinc-400 leading-relaxed mb-8">
-              From rescue to rehabilitation — we track every animal's journey and reward every savior with a Government of India recognition certificate.
+              From rescue to rehabilitation — we track every animal&apos;s journey and reward every savior with a Government of India recognition certificate.
             </p>
             <div className="flex gap-4 flex-wrap">
               <button onClick={() => navigate("/register")}
