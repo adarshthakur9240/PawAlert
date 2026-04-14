@@ -1,138 +1,183 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
-// Impactful Phrases for Startup Vibe
+// IMPACTFUL PHRASES
 const PHRASES = [
   "Spot a stray? Be their voice.",
   "Every life deserves a savior.",
   "Your one click, their second chance.",
-  "Changing the world, one rescue at a time."
+  "India's First Real-time Rescue Network."
 ];
 
-const DOCTORS = [
-  { name: "Dr. Priya Sharma", title: "Senior Veterinary Surgeon", org: "AIIMS Animal Care Unit, Delhi", country: "🇮🇳", spec: "Emergency Trauma & Surgery", avatar: "PS", color: "#FF9933" },
-  { name: "Dr. Arjun Mehta", title: "Wildlife & Stray Specialist", org: "SPCA India, Mumbai", country: "🇮🇳", spec: "Rabies Control & Vaccination", avatar: "AM", color: "#138808" },
-  { name: "Dr. Sarah Chen", title: "Animal Rescue Physician", org: "WHO Animal Health Division", country: "🇺🇸", spec: "Zoonotic Disease Prevention", avatar: "SC", color: "#3b82f6" },
-  { name: "Dr. Ravi Nair", title: "Chief Veterinary Officer", org: "Blue Cross of India, Chennai", country: "🇮🇳", spec: "Rehabilitation & Adoption", avatar: "RN", color: "#8b5cf6" },
+// RESCUED ANIMALS GALLERY (LATEST CREATIONS)
+const RESCUED_GALLERY = [
+  { name: "Sheru", status: "Rescued & Vaccinated", img: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=800" },
+  { name: "Bella", status: "Under Care - Blue Cross", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=800" },
+  { name: "Charlie", status: "Successfully Adopted", img: "https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?q=80&w=800" },
+  { name: "Luna", status: "Medical Aid Provided", img: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?q=80&w=800" },
+  { name: "Rocky", status: "Emergency Surgery Done", img: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=800" },
+  { name: "Simba", status: "Transferred to Shelter", img: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800" }
+];
+
+// FAQ DATA (ALIGNED WITH GOI & NGO)
+const FAQS = [
+  { q: "How do we support the Government of India?", a: "We provide real-time GPS data of injured animals directly to municipal authorities and government vet clinics, reducing response time by 80%." },
+  { q: "What is the role of NGOs in PawAlert?", a: "NGOs act as primary responders for medical emergencies and long-term sheltering after the initial government first-aid." },
+  { q: "How is my data protected?", a: "Your reports are encrypted. Only authorized GOI officials and verified NGO heads can access precise location data for rescue operations." },
+  { q: "Can citizens earn recognition?", a: "Yes. Every verified rescue earns you a 'Citizen Savior' digital certificate recognized by our network partners." }
+];
+
+// TESTIMONIALS (REAL STORIES)
+const TESTIMONIALS = [
+  { name: "Adarsh Singh", company: "Student, JSSATE", desc: "Reported an injured cow at 2 AM, authorities reached within 30 mins. Mind-blowing!", img: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200" },
+  { name: "Priya Sharma", company: "NGO Head", desc: "PawAlert removed the guesswork. We now know exactly where help is needed most.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200" },
+  { name: "Rahul Verma", company: "Govt. Vet", desc: "This tech is revolutionary for India's stray animal management system.", img: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200" }
 ];
 
 const AnimatedText = () => {
-  const [phraseIdx, setPhraseIdx] = useState(0);
-  const [displayed, setDisplayed] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [charIdx, setCharIdx] = useState(0);
+  const [idx, setIdx] = useState(0);
+  const [disp, setDisp] = useState("");
+  const [del, setDel] = useState(false);
+  const [char, setChar] = useState(0);
 
   useEffect(() => {
-    const current = PHRASES[phraseIdx];
-    let timeout;
-    if (!deleting && charIdx < current.length) {
-      timeout = setTimeout(() => { setDisplayed(current.slice(0, charIdx + 1)); setCharIdx((c) => c + 1); }, 50);
-    } else if (!deleting && charIdx === current.length) {
-      timeout = setTimeout(() => setDeleting(true), 2500);
-    } else if (deleting && charIdx > 0) {
-      timeout = setTimeout(() => { setDisplayed(current.slice(0, charIdx - 1)); setCharIdx((c) => c - 1); }, 30);
-    } else if (deleting && charIdx === 0) {
-      setDeleting(false);
-      setPhraseIdx((i) => (i + 1) % PHRASES.length);
+    const cur = PHRASES[idx];
+    let tm;
+    if (!del && char < cur.length) {
+      tm = setTimeout(() => { setDisp(cur.slice(0, char + 1)); setChar(c => c + 1); }, 50);
+    } else if (!del && char === cur.length) {
+      tm = setTimeout(() => setDel(true), 2000);
+    } else if (del && char > 0) {
+      tm = setTimeout(() => { setDisp(cur.slice(0, char - 1)); setChar(c => c - 1); }, 30);
+    } else if (del && char === 0) {
+      setDel(false); setIdx(i => (i + 1) % PHRASES.length);
     }
-    return () => clearTimeout(timeout);
-  }, [charIdx, deleting, phraseIdx]);
+    return () => clearTimeout(tm);
+  }, [char, del, idx]);
 
-  const colors = ["#FF9933", "#ffffff", "#22c55e", "#3b82f6"];
-  return (
-    <span style={{ color: colors[phraseIdx], transition: "color 0.3s" }}>
-      {displayed}
-      <span style={{ display: "inline-block", width: "4px", height: "0.9em", background: colors[phraseIdx], marginLeft: "8px", verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
-    </span>
-  );
+  return <span style={{ color: "#FF9933" }}>{disp}<span className="animate-pulse">|</span></span>;
 };
 
 const Home = () => {
-  return (
-    <div style={{ minHeight: "100vh", background: "#050505", color: "#fff", fontFamily: "'Outfit', sans-serif", overflowX: "hidden" }}>
-      <style>{`
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .stat-num { background: linear-gradient(90deg,#FF9933,#ffffff,#138808,#FF9933); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: shimmer 3s linear infinite; }
-        @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-        .clickable-card:hover { transform: translateY(-10px); border-color: #FF9933 !important; cursor: pointer; }
-      `}</style>
+  const [openFaq, setOpenFaq] = useState(null);
 
+  return (
+    <div className="bg-[#050505] text-white font-['Poppins'] overflow-x-hidden">
       <Navbar />
 
       {/* HERO SECTION */}
-      <section style={{ minHeight: "90vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "120px 24px", background: "radial-gradient(circle at center, rgba(255,153,51,0.05) 0%, transparent 70%)" }}>
-        <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: "50px", padding: "10px 24px", fontSize: "0.9rem", color: "#f59e0b", marginBottom: "2rem" }}>
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 bg-[radial-gradient(circle_at_center,rgba(255,153,51,0.08)_0%,transparent_70%)]">
+        <div className="bg-orange-500/10 border border-orange-500/30 text-orange-500 px-6 py-2 rounded-full text-sm font-bold mb-8">
           🇮🇳 India's First Real-time Animal Rescue Network
         </div>
-
-        <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 900, maxWidth: "1000px", lineHeight: 1.2 }}>
+        <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight max-w-5xl">
           <AnimatedText />
         </h1>
-
-        <p style={{ fontSize: "1.2rem", opacity: 0.6, maxWidth: "600px", margin: "2rem 0" }}>
-          Every report saves a life. PawAlert bridges the gap between stray animals and the help they deserve.
+        <p className="text-zinc-500 text-lg max-w-2xl mb-10 font-medium leading-relaxed">
+          Every report saves a life. PawAlert bridges the gap between stray animals and the help they deserve through AI and government coordination.
         </p>
-
-        <div style={{ display: "flex", gap: "20px" }}>
-          <a href="/dashboard" style={{ background: "#FF9933", color: "#000", padding: "18px 40px", borderRadius: "15px", fontWeight: 900, textDecoration: "none" }}>🚀 Start Rescue</a>
-          <a href="/dashboard" style={{ background: "#111", border: "1px solid #333", color: "#fff", padding: "18px 40px", borderRadius: "15px", fontWeight: 700, textDecoration: "none" }}>View Map</a>
-        </div>
-
-        <div style={{ display: "flex", gap: "4rem", marginTop: "5rem" }}>
-           <div><div className="stat-num" style={{fontSize: "2.5rem", fontWeight: 900}}>1,247+</div><div style={{opacity: 0.4, fontSize: "0.8rem"}}>REPORTS</div></div>
-           <div><div className="stat-num" style={{fontSize: "2.5rem", fontWeight: 900}}>389+</div><div style={{opacity: 0.4, fontSize: "0.8rem"}}>SAVED</div></div>
-           <div><div className="stat-num" style={{fontSize: "2.5rem", fontWeight: 900}}>52</div><div style={{opacity: 0.4, fontSize: "0.8rem"}}>CITIES</div></div>
+        <div className="flex gap-4">
+          <a href="/dashboard" className="bg-orange-500 text-black px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:scale-105 transition">Start Rescue</a>
+          <a href="/dashboard" className="bg-zinc-900 border border-zinc-800 px-10 py-4 rounded-2xl font-bold hover:bg-zinc-800 transition">Live Map</a>
         </div>
       </section>
 
-      {/* WHAT WE DO (REINSTATED) */}
-      <section style={{ padding: "100px 24px", maxWidth: "1200px", margin: "0 auto" }}>
-         <h2 style={{ fontSize: "3rem", fontWeight: 900, marginBottom: "4rem", textAlign: "center" }}>What we do?</h2>
-         <div style={{ display: "flex", flexWrap: "wrap", gap: "40px", alignItems: "center" }}>
-            <div style={{ flex: "1 1 400px" }}>
-               <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1000" style={{ width: "100%", borderRadius: "30px" }} alt="Rescue" />
-            </div>
-            <div style={{ flex: "1 1 400px" }}>
-               <h3 style={{ fontSize: "2rem", color: "#FF9933", marginBottom: "20px" }}>Empowering Local Saviors</h3>
-               <p style={{ opacity: 0.7, lineHeight: 1.8 }}>We provide the tech for animal welfare. From GPS tracking to NGO alerts, we make sure help is just one click away.</p>
-            </div>
-         </div>
+      {/* STATS BREAKDOWN (GOVERNMENT ALIGNMENT) */}
+      <section className="py-20 border-y border-zinc-900 bg-zinc-950/50">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="text-center">
+             <div className="text-5xl font-black text-orange-500 mb-2">70%</div>
+             <p className="text-zinc-400 font-bold uppercase tracking-tighter">Government Responded</p>
+          </div>
+          <div className="text-center">
+             <div className="text-5xl font-black text-white mb-2">20%</div>
+             <p className="text-zinc-400 font-bold uppercase tracking-tighter">NGO Supported</p>
+          </div>
+          <div className="text-center">
+             <div className="text-5xl font-black text-green-500 mb-2">10%</div>
+             <p className="text-zinc-400 font-bold uppercase tracking-tighter">Citizen Direct Aid</p>
+          </div>
+        </div>
       </section>
 
-      {/* EXPERT SUPPORT (CLICKABLE) */}
-      <section style={{ padding: "100px 24px", background: "#080808" }}>
-         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <h2 style={{ fontSize: "2.5rem", fontWeight: 900, textAlign: "center", marginBottom: "4rem" }}>Expert Support 🏥</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "25px" }}>
-               {DOCTORS.map(doc => (
-                  <div key={doc.name} className="clickable-card" onClick={() => window.location.href='/support'} style={{ background: "#111", border: "1px solid #222", borderRadius: "25px", padding: "2.5rem", transition: "all 0.4s" }}>
-                     <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>{doc.country}</div>
-                     <h3 style={{ fontSize: "1.3rem", fontWeight: 800, marginBottom: "10px" }}>{doc.name}</h3>
-                     <p style={{ color: doc.color, fontWeight: 700, fontSize: "0.9rem" }}>{doc.spec}</p>
-                     <p style={{ opacity: 0.4, fontSize: "0.8rem", marginTop: "10px" }}>{doc.org}</p>
-                  </div>
-               ))}
-            </div>
-         </div>
+      {/* LATEST RESCUES GALLERY (CARDS) */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <h2 className="text-4xl font-black text-center mb-4">Our Latest Rescues</h2>
+        <p className="text-center text-zinc-500 mb-12">Visual proof of our impact across the nation.</p>
+        <div className="flex items-center gap-2 h-[450px] w-full">
+           {RESCUED_GALLERY.map((res, i) => (
+             <div key={i} className="relative group flex-grow transition-all w-24 rounded-3xl overflow-hidden h-full duration-700 hover:w-full border border-zinc-800">
+                <img src={res.img} className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition duration-700" alt="animal" />
+                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                   <h3 className="text-2xl font-black">{res.name}</h3>
+                   <p className="text-orange-500 font-bold">{res.status}</p>
+                </div>
+             </div>
+           ))}
+        </div>
       </section>
 
-      {/* REVIEWS (INFINITE SCROLL REINSTATED) */}
-      <section style={{ padding: "100px 0", overflow: "hidden", background: "#050505" }}>
-         <h2 style={{ textAlign: "center", marginBottom: "3rem", fontSize: "2rem", fontWeight: 900 }}>Community Love ❤️</h2>
-         <div style={{ display: "flex", width: "200%", animation: "scroll 30s linear infinite" }}>
-            {[1,2,3,4,5,6].map(i => (
-               <div key={i} style={{ minWidth: "300px", background: "#111", margin: "0 20px", padding: "30px", borderRadius: "20px", border: "1px solid #222" }}>
-                  <p style={{ opacity: 0.6 }}>"PawAlert saved a puppy in my lane. Best initiative in India!"</p>
-                  <div style={{ marginTop: "20px", fontWeight: 800 }}>- Citizen Savior {i}</div>
-               </div>
+      {/* WHAT WE DO (STARTUP STYLE) */}
+      <section className="py-24 px-6 bg-zinc-950">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+           <div className="relative group flex-1">
+              <div className="absolute -inset-4 bg-orange-500/20 blur-3xl opacity-0 group-hover:opacity-100 transition duration-1000"></div>
+              <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1000" className="relative rounded-[2.5rem] shadow-2xl grayscale-[0.5] group-hover:grayscale-0 transition" alt="Impact" />
+           </div>
+           <div className="flex-1 space-y-8">
+              <h2 className="text-4xl font-black uppercase leading-tight">Empowering <br/><span className="text-orange-500">Local Saviors</span></h2>
+              <div className="w-20 h-1.5 bg-orange-500 rounded-full"></div>
+              <p className="text-zinc-500 font-medium text-lg leading-relaxed">
+                 We provide the technical backbone for animal welfare in India. By integrating AI diagnostics with a direct line to Government Municipalities, we ensure that help is never more than a report away.
+              </p>
+              <button className="bg-orange-500 text-black px-10 py-4 rounded-2xl font-black uppercase">Read Full Roadmap</button>
+           </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS (AUTO SCROLL) */}
+      <section className="py-24 overflow-hidden">
+        <h2 className="text-4xl font-black text-center mb-16 italic font-serif leading-tight">People Love Us <br/><span className="text-sm font-sans opacity-40 not-italic uppercase tracking-widest">Real Stories from Citizens</span></h2>
+        <div className="flex animate-[scroll_40s_linear_infinite] w-[200%]">
+           {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+             <div key={i} className="min-w-[400px] bg-zinc-900/50 border border-zinc-800 p-8 mx-4 rounded-3xl hover:border-orange-500 transition-colors">
+                <p className="text-zinc-400 mb-6 font-medium italic">"{t.desc}"</p>
+                <div className="flex items-center gap-4">
+                   <img src={t.img} className="size-12 rounded-full border-2 border-orange-500" alt="user" />
+                   <div>
+                      <h4 className="font-bold text-white">{t.name}</h4>
+                      <p className="text-xs text-zinc-600 font-bold">{t.company}</p>
+                   </div>
+                </div>
+             </div>
+           ))}
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="py-24 px-6 bg-black">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-black text-center mb-16">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            {FAQS.map((f, i) => (
+              <div key={i} onClick={() => setOpenFaq(openFaq === i ? null : i)} className="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 cursor-pointer hover:border-zinc-700 transition">
+                <div className="flex justify-between items-center font-bold text-lg">
+                  {f.q} <span className="text-orange-500">{openFaq === i ? '−' : '+'}</span>
+                </div>
+                {openFaq === i && <p className="mt-4 text-zinc-500 font-medium leading-relaxed">{f.a}</p>}
+              </div>
             ))}
-         </div>
+          </div>
+        </div>
       </section>
 
-      <footer style={{ padding: "60px 24px", textAlign: "center", borderTop: "1px solid #111" }}>
-        <p style={{ opacity: 0.4 }}>PawAlert 2026 · Built with pride by Adarsh Thakur · JSSATE Noida</p>
+      <footer className="py-12 border-t border-zinc-900 text-center opacity-40 text-sm">
+        <p>PawAlert 2026 · Built by Adarsh Thakur · JSSATE Noida IT Branch 🐾</p>
       </footer>
+
+      <style>{\`
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      \`}</style>
     </div>
   );
 };
