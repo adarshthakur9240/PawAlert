@@ -316,13 +316,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-
-        <div className="text-2xl font-black mb-2">🐾 PawAlert</div>
-        <p className="text-zinc-700 text-xs uppercase tracking-[0.3em] font-black mb-1">Community Animal Rescue Network 🇮🇳</p>
-        <p className="text-zinc-800 text-xs">Built with ❤️ by Adarsh Thakur · support@pawalert.in</p>
-      </footer>
     </div>
   );
 }
