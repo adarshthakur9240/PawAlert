@@ -81,6 +81,8 @@ export default function Home() {
         @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
         .marquee-track{animation:marquee 20s linear infinite}
         @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+        .stat-num{background:linear-gradient(90deg,#FF9933,#ffffff,#138808,#FF9933);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite}
         .fade-up{animation:fadeUp 0.7s ease both}
         .doc-card:hover{transform:translateY(-6px)!important;box-shadow:0 24px 48px rgba(0,0,0,0.4)!important}
       `}</style>
@@ -100,7 +102,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-5xl w-full min-h-[140px] md:min-h-[220px] flex items-center justify-center mb-8 fade-up">
-          <h1 className="text-5xl md:text-8xl font-black leading-tight tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-black leading-tight tracking-tight font-outfit">
             <AnimatedText setTheme={setTheme} />
           </h1>
         </div>
@@ -123,7 +125,7 @@ export default function Home() {
         <div className="flex gap-0 border-t border-zinc-800/60 pt-10 fade-up">
           {[["1,247+", "Animals Reported"], ["389+", "Rescued & Vaccinated"], ["52", "Cities Active"]].map(([num, label], i) => (
             <div key={label} className={`px-8 md:px-14 text-center ${i < 2 ? "border-r border-zinc-800/60" : ""}`}>
-              <div className="text-3xl md:text-4xl font-black text-white">{num}</div>
+              <div className="text-3xl md:text-4xl font-black stat-num">{num}</div>
               <div className="text-zinc-600 text-[10px] uppercase tracking-[0.2em] mt-1 font-bold">{label}</div>
             </div>
           ))}
@@ -316,7 +318,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 py-12 text-center border-t border-zinc-900/60">
+
         <div className="text-2xl font-black mb-2">🐾 PawAlert</div>
         <p className="text-zinc-700 text-xs uppercase tracking-[0.3em] font-black mb-1">Community Animal Rescue Network 🇮🇳</p>
         <p className="text-zinc-800 text-xs">Built with ❤️ by Adarsh Thakur · support@pawalert.in</p>

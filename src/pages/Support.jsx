@@ -56,7 +56,7 @@ const Support = () => {
   const [openFaq, setOpenFaq] = useState(null);
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-main)", color: "var(--text-main)", fontFamily: "'Inter', sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0a0a00 0%, #1a1200 40%, #0d1a00 100%)", color: "var(--text-main)", fontFamily: "'Inter', sans-serif", overflowX: "hidden" }}>
       <style>{`
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
@@ -73,14 +73,14 @@ const Support = () => {
 
       <Navbar />
 
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "120px 24px 80px", background: "radial-gradient(ellipse at 20% 50%, rgba(255,153,51,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(19,136,8,0.1) 0%, transparent 60%), radial-gradient(ellipse at 50% 80%, rgba(59,130,246,0.08) 0%, transparent 50%)", position: "relative", overflow: "hidden" }}>
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "120px 24px 80px", background: "radial-gradient(ellipse at 20% 50%, rgba(255,153,51,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 30%, rgba(19,136,8,0.12) 0%, transparent 60%)", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
 
         <div className="hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: "50px", padding: "8px 20px", fontSize: "0.85rem", fontWeight: 600, color: "#f59e0b", marginBottom: "2rem" }}>
           🐾 Community Animal Rescue Network
         </div>
 
-        <h1 className="hero-h1" style={{ fontSize: "clamp(2.8rem,7vw,6rem)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-2px", maxWidth: "900px", margin: "0 0 1.5rem" }}>
+        <h1 className="hero-h1" style={{ fontSize: "clamp(2rem,5vw,4.5rem)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-2px", fontFamily: "'Outfit', sans-serif", maxWidth: "900px", margin: "0 0 1.5rem" }}>
           <AnimatedText />
           <br />
           <span style={{ color: "var(--text-main)", opacity: 0.9 }}>Make Cities Safer</span>
@@ -158,10 +158,7 @@ const Support = () => {
         </div>
       </section>
 
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "3rem 24px", textAlign: "center", opacity: 0.5, fontSize: "0.85rem" }}>
-        <p style={{ margin: "0 0 8px" }}>🐾 PawAlert — Community Animal Rescue Network 🇮🇳</p>
-        <p style={{ margin: 0, fontSize: "0.75rem" }}>Built with ❤️ by Adarsh Thakur · support@pawalert.in</p>
-      </footer>
+
     </div>
   );
 };
