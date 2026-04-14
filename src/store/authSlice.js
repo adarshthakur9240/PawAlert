@@ -4,23 +4,23 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: JSON.parse(localStorage.getItem("user")) || null,
-    token: localStorage.getItem("token") || null,
+    isAuthenticated: !!localStorage.getItem("user"),
   },
   reducers: {
-    setAuth: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", action.payload.token);
+    // Ye raha login action jo missing tha
+    login: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      state.isAuthenticated = false;
       localStorage.removeItem("user");
-      localStorage.removeItem("token");
     },
   },
 });
 
-export const { setAuth, logout } = authSlice.actions;
+// CRITICAL: Actions ko export karna zaroori hai
+export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;
