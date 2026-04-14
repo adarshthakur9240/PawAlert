@@ -14,21 +14,19 @@ dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 
-// --- UPDATED CORS CONFIGURATION ---
-app.use(
-  cors({
-    origin: ["https://paw-alert-ten.vercel.app", "http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // OPTIONS zaroori hai pre-flight requests ke liye
-    allowedHeaders: ["Content-Type", "Authorization"], // Authorization header allow karna padega
-    credentials: true,
-  }),
-);
-// ----------------------------------
-
+app.use(cors({
+  origin: [
+    "https://paw-alert-ten.vercel.app",
+    "https://paw-alert-7xz35sef2-adarshthakur9240s-projects.vercel.app",
+    "https://paw-alert-git-main-adarshthakur9240s-projects.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+  ],
+  credentials: true
+}));
 app.use(express.json({ limit: "10mb" }));
 
-mongoose
-  .connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("Database connected ✅"))
   .catch((err) => console.log("DB Error:", err));
 

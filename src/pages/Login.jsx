@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { login } from '../store/authSlice.js';
+import { setAuth } from '../store/authSlice.js';
 import api from '../configs/api.js';
 import toast from 'react-hot-toast';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
@@ -23,7 +23,7 @@ const Login = () => {
       const { data } = await api.post('/api/auth/login', { email, password });
       
       // Dispatching to Redux Store
-      dispatch(login({ user: data.user, token: data.token }));
+      dispatch(setAuth({ user: data.user, token: data.token }));
       
       toast.success('Welcome back! 🐾');
       navigate('/dashboard');
