@@ -88,6 +88,7 @@ const Register = () => {
             <button onClick={() => setShowClerk(false)} style={{ background: "none", border: "none", color: "#52525b", fontSize: "0.8rem", cursor: "pointer", marginBottom: "15px" }}>← Change Role</button>
             <SignUp 
               routing="path" path="/register" signInUrl="/login"
+              fallbackRedirectUrl="/dashboard"
               unsafeMetadata={{ userType: selectedType, location: locationText }}
               appearance={{
                 variables: { colorPrimary: "#f97316", colorBackground: "#111111", colorText: "#fff" },

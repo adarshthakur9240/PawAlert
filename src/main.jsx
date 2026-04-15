@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom' // ✅ Added this
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 import { ClerkProvider } from '@clerk/clerk-react'
@@ -16,7 +16,11 @@ if (!PUBLISHABLE_KEY) {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <ClerkProvider 
+        publishableKey={PUBLISHABLE_KEY} 
+        afterSignInUrl="/dashboard"
+        afterSignUpUrl="/dashboard"
+      >
         <BrowserRouter> 
           <App />
         </BrowserRouter>
