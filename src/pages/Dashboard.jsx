@@ -19,11 +19,16 @@ import {
   Sparkles,
   HeartPulse,
   AlertCircle,
-  Activity,
-  Zap,
+  ShieldCheck,
+  Crown,
   Heart,
   Home,
-  Smartphone,
+  Edit,
+  Sun,
+  Moon,
+  Activity,
+  Zap,
+  Info,
 } from "lucide-react";
 
 const SPECIES_EMOJIS = {
@@ -37,6 +42,7 @@ const SPECIES_EMOJIS = {
   snake: "🐍",
   other: "🐾",
 };
+
 const STATUS_COLORS = {
   pending: "#ef4444",
   rescued: "#22c55e",
@@ -54,6 +60,7 @@ const Dashboard = () => {
   const fileInputRef = useRef(null);
   const certificateRef = useRef(null);
 
+  // Hybrid Identity
   const user =
     reduxUser ||
     (clerkUser
@@ -75,6 +82,7 @@ const Dashboard = () => {
   const [aiMeds, setAiMeds] = useState("");
   const [aiDetectedSpecies, setAiDetectedSpecies] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
+
   const [form, setForm] = useState({
     reporterName: "",
     animalType: "dog",
@@ -85,13 +93,10 @@ const Dashboard = () => {
 
   const getRoleLabel = (r) => {
     const rl = r?.toLowerCase();
-    return rl === "admin"
-      ? "ADMIN"
-      : rl === "gov"
-        ? "GOI"
-        : rl === "ngo"
-          ? "NGO"
-          : "USER";
+    if (rl === "admin") return "ADMIN";
+    if (rl === "gov" || rl === "government") return "GOI";
+    if (rl === "ngo") return "NGO";
+    return "USER";
   };
 
   const rescuedCount = reports.filter(
@@ -123,32 +128,38 @@ const Dashboard = () => {
             clerkId: clerkUser.id,
             userType: clerkUser.unsafeMetadata?.userType || "citizen",
           });
-          if (data.success)
+          if (data.success) {
             dispatch({
               type: "auth/loginSuccess",
               payload: { user: data.user, token: data.token },
             });
+          }
         } catch (err) {
           console.error("Sync Error");
         }
       }
     };
     syncIdentity();
-  }, [isLoaded, isSignedIn, clerkUser, token]);
+  }, [isLoaded, isSignedIn, clerkUser, token, dispatch]);
 
   useEffect(() => {
     if (token) loadReports();
+    if (user) setForm((prev) => ({ ...prev, reporterName: user.name }));
   }, [token]);
+
   const loadReports = async () => {
     try {
       const { data } = await api.get("/api/reports");
       setReports(data);
-    } catch (e) {}
+    } catch (e) {
+      toast.error("Failed to load feed");
+    }
   };
 
   const handleAiAnalysis = async () => {
-    if (!photoBase64) return toast.error("Photo required!");
+    if (!photoBase64) return toast.error("Capture photo first!");
     setIsAiLoading(true);
+    setAiAdvice("");
     try {
       const { data } = await api.post("/api/ai/analyze-image", {
         image: photoBase64,
@@ -157,9 +168,14 @@ const Dashboard = () => {
       setAiDetectedSpecies(data.species);
       setAiAdvice(data.medicationAdvice);
       setAiMeds(data.firstAid);
-      toast.success("AI Scanned!");
+      setForm((prev) => ({
+        ...prev,
+        animalType: data.species?.toLowerCase() || "other",
+        urgency: data.urgency || "medium",
+      }));
+      toast.success("AI Scan Complete! ✨");
     } catch (err) {
-      toast.error("AI Error");
+      toast.error("AI Scan failed.");
     } finally {
       setIsAiLoading(false);
     }
@@ -169,32 +185,39 @@ const Dashboard = () => {
     setIsLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setForm((p) => ({
-          ...p,
+        setForm((prev) => ({
+          ...prev,
           location: `Pinned at ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
         }));
         setIsLocationLoading(false);
+        toast.success("GPS Locked! 📍");
       },
-      () => setIsLocationLoading(false),
+      () => {
+        setIsLocationLoading(false);
+        toast.error("Location denied");
+      },
     );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!photoBase64) return toast.error("Photo is required!");
+    const loadingToast = toast.loading("Broadcasting Emergency...");
     try {
-      await api.post(
-        "/api/reports",
-        { ...form, photo: photoBase64, aiAdvice, aiMeds },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const payload = { ...form, photo: photoBase64, aiAdvice, aiMeds };
+      await api.post("/api/reports", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Emergency Alert Sent! 🐾", { id: loadingToast });
       setShowModal(false);
       loadReports();
-      toast.success("Alert Sent!");
-    } catch (err) {}
+    } catch (err) {
+      toast.error("Submission failed!", { id: loadingToast });
+    }
   };
 
   const downloadCertificate = async () => {
-    if (rescuedCount < 1) return toast.error("Rescue 1 animal to unlock!");
+    if (rescuedCount < 1) return toast.error("Rescue at least 1 animal first!");
     setIsDownloading(true);
     try {
       const el = certificateRef.current;
@@ -202,7 +225,7 @@ const Dashboard = () => {
       el.style.position = "fixed";
       el.style.top = "0px";
       el.style.zIndex = "99999";
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
       const canvas = await html2canvas(el, {
         scale: 3,
         useCORS: true,
@@ -216,7 +239,7 @@ const Dashboard = () => {
       pdf.save(`Official_Certificate_${user?.name}.pdf`);
       toast.success("Certificate Secured! 🇮🇳");
     } catch (err) {
-      toast.error("Error!");
+      toast.error("Download failed!");
     } finally {
       setIsDownloading(false);
     }
@@ -226,7 +249,7 @@ const Dashboard = () => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#0a0a0a",
+        background: "#080808",
         color: "#fff",
         fontFamily: "'Inter', sans-serif",
       }}
@@ -240,7 +263,7 @@ const Dashboard = () => {
           padding: "0 20px",
         }}
       >
-        {/* Header Section */}
+        {/* Header with Role Branding */}
         <div
           style={{
             display: "flex",
@@ -281,6 +304,7 @@ const Dashboard = () => {
               Dashboard
             </h1>
           </div>
+
           <div
             style={{
               display: "flex",
@@ -290,6 +314,7 @@ const Dashboard = () => {
               padding: "10px 25px",
               borderRadius: "100px",
               border: "1px solid #222",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
             }}
           >
             <div
@@ -321,11 +346,10 @@ const Dashboard = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            position: "relative",
-            overflow: "hidden",
+            boxShadow: `0 20px 50px ${badge.color}15`,
           }}
         >
-          <div style={{ position: "relative", zIndex: 1 }}>
+          <div>
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               <span style={{ fontSize: "4rem" }}>{badge.icon}</span>
               <h2
@@ -339,8 +363,7 @@ const Dashboard = () => {
               </h2>
             </div>
             <p style={{ fontSize: "1.2rem", opacity: 0.8, marginTop: "10px" }}>
-              Saving lives together. You rescued <b>{rescuedCount}</b> animals.
-              🇮🇳
+              Welcome back Savior. You rescued <b>{rescuedCount}</b> animals. 🇮🇳
             </p>
           </div>
           <button
@@ -379,32 +402,32 @@ const Dashboard = () => {
         >
           {[
             {
-              l: "Total Reports",
-              v: reports.length,
-              c: "#3b82f6",
-              i: <Activity size={22} />,
+              label: "Total Alerts",
+              value: reports.length,
+              color: "#3b82f6",
+              icon: <Activity size={24} />,
             },
             {
-              l: "Pending Case",
-              v: reports.filter((r) => r.status === "pending").length,
-              c: "#ef4444",
-              i: <AlertCircle size={22} />,
+              label: "Emergency Pending",
+              value: reports.filter((r) => r.status === "pending").length,
+              color: "#ef4444",
+              icon: <AlertCircle size={24} />,
             },
             {
-              l: "Successful Rescues",
-              v: reports.filter((r) => r.status === "rescued").length,
-              c: "#22c55e",
-              i: <Heart size={22} />,
+              label: "Rescued Lives",
+              value: reports.filter((r) => r.status === "rescued").length,
+              color: "#22c55e",
+              icon: <Heart size={24} />,
             },
             {
-              l: "Adopted Homes",
-              v: reports.filter((r) => r.status === "adopted").length,
-              c: "#ec4899",
-              i: <Home size={22} />,
+              label: "Adopted",
+              value: reports.filter((r) => r.status === "adopted").length,
+              color: "#ec4899",
+              icon: <Home size={24} />,
             },
           ].map((s) => (
             <div
-              key={s.l}
+              key={s.label}
               style={{
                 background: "#111",
                 borderRadius: "24px",
@@ -412,9 +435,13 @@ const Dashboard = () => {
                 border: "1px solid #222",
               }}
             >
-              <div style={{ color: s.c, marginBottom: "12px" }}>{s.i}</div>
-              <div style={{ fontSize: "2.5rem", fontWeight: 900, color: s.c }}>
-                {s.v}
+              <div style={{ color: s.color, marginBottom: "12px" }}>
+                {s.icon}
+              </div>
+              <div
+                style={{ fontSize: "2.5rem", fontWeight: 900, color: s.color }}
+              >
+                {s.value}
               </div>
               <div
                 style={{
@@ -424,13 +451,13 @@ const Dashboard = () => {
                   textTransform: "uppercase",
                 }}
               >
-                {s.l}
+                {s.label}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Feed */}
+        {/* Activity Feed */}
         <div
           style={{
             display: "grid",
@@ -438,9 +465,9 @@ const Dashboard = () => {
             gap: "2.5rem",
           }}
         >
-          {reports.map((r) => (
+          {reports.map((report) => (
             <div
-              key={r._id}
+              key={report._id}
               style={{
                 background: "#111",
                 borderRadius: "32px",
@@ -448,31 +475,64 @@ const Dashboard = () => {
                 border: "1px solid #222",
               }}
             >
+              <div
+                style={{
+                  position: "absolute",
+                  top: "20px",
+                  left: "20px",
+                  zIndex: 10,
+                }}
+              >
+                <span
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: "100px",
+                    fontSize: "0.75rem",
+                    fontWeight: 900,
+                    background: STATUS_COLORS[report.status] || "#6b7280",
+                    color: "#fff",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {report.status}
+                </span>
+              </div>
               <img
-                src={r.photo}
+                src={report.photo}
                 style={{ width: "100%", height: "240px", objectFit: "cover" }}
+                alt="animal"
               />
               <div style={{ padding: "2rem" }}>
                 <h3 style={{ fontWeight: 800, fontSize: "1.4rem" }}>
-                  {SPECIES_EMOJIS[r.animalType] || "🐾"}{" "}
-                  {r.animalType?.toUpperCase()} ALERT
+                  {SPECIES_EMOJIS[report.animalType] || "🐾"}{" "}
+                  {report.animalType?.toUpperCase()} ALERT
                 </h3>
                 <p style={{ opacity: 0.6 }}>
-                  <MapPin size={18} color="#f59e0b" /> {r.location}
+                  <MapPin size={18} color="#f59e0b" /> {report.location}
                 </p>
-                {r.aiAdvice && (
+                {report.aiAdvice && (
                   <div
                     style={{
                       background: "rgba(34,197,94,0.1)",
-                      padding: "1.2rem",
+                      border: "1.5px solid #22c55e30",
                       borderRadius: "16px",
+                      padding: "1rem",
                       marginTop: "1rem",
-                      border: "1px solid #1a331a",
-                      fontSize: "0.9rem",
-                      color: "#4ade80",
                     }}
                   >
-                    {r.aiAdvice}
+                    <p
+                      style={{
+                        fontSize: "0.8rem",
+                        color: "#16a34a",
+                        fontWeight: 800,
+                        margin: "0 0 5px",
+                      }}
+                    >
+                      🤖 AI VET ADVICE
+                    </p>
+                    <p style={{ fontSize: "0.9rem", margin: 0, opacity: 0.9 }}>
+                      {report.aiAdvice}
+                    </p>
                   </div>
                 )}
               </div>
@@ -481,7 +541,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* FAB */}
+      {/* Floating Plus Button */}
       <button
         onClick={() => setShowModal(true)}
         style={{
@@ -492,42 +552,43 @@ const Dashboard = () => {
           width: "80px",
           height: "80px",
           borderRadius: "50%",
-          border: "none",
-          cursor: "pointer",
+          zIndex: 1000,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          border: "none",
+          cursor: "pointer",
           boxShadow: "0 15px 35px rgba(245,158,11,0.5)",
         }}
       >
         <Plus size={45} strokeWidth={3} color="white" />
       </button>
 
-      {/* Modal */}
+      {/* Emergency Modal */}
       {showModal && (
         <div
           style={{
             position: "fixed",
             inset: 0,
             background: "rgba(0,0,0,0.9)",
-            zIndex: 5000,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "20px",
+            zIndex: 5000,
             backdropFilter: "blur(15px)",
+            padding: "20px",
           }}
         >
           <div
             style={{
               background: "#111",
-              width: "100%",
-              maxWidth: "550px",
               borderRadius: "35px",
               padding: "40px",
-              border: "1px solid #222",
-              maxHeight: "90vh",
+              width: "100%",
+              maxWidth: "550px",
+              maxHeight: "92vh",
               overflowY: "auto",
+              border: "1px solid #222",
             }}
           >
             <div
@@ -546,6 +607,7 @@ const Dashboard = () => {
                 size={30}
               />
             </div>
+
             <div
               onClick={() => fileInputRef.current.click()}
               style={{
@@ -553,8 +615,8 @@ const Dashboard = () => {
                 border: "3px dashed #222",
                 borderRadius: "25px",
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
+                alignItems: "center",
                 cursor: "pointer",
                 background: "#0a0a0a",
                 marginBottom: "25px",
@@ -570,6 +632,7 @@ const Dashboard = () => {
                 <Camera size={50} opacity={0.3} />
               )}
             </div>
+
             <input
               type="file"
               ref={fileInputRef}
@@ -580,12 +643,13 @@ const Dashboard = () => {
                 const file = e.target.files[0];
                 if (file) {
                   setPhotoPreview(URL.createObjectURL(file));
-                  const r = new FileReader();
-                  r.readAsDataURL(file);
-                  r.onloadend = () => setPhotoBase64(r.result);
+                  const reader = new FileReader();
+                  reader.readAsDataURL(file);
+                  reader.onloadend = () => setPhotoBase64(reader.result);
                 }
               }}
             />
+
             <div
               style={{
                 display: "grid",
@@ -598,7 +662,7 @@ const Dashboard = () => {
                 onClick={getLiveLocation}
                 style={{
                   background: "#3b82f6",
-                  color: "#fff",
+                  color: "white",
                   padding: "14px",
                   borderRadius: "100px",
                   border: "none",
@@ -612,7 +676,7 @@ const Dashboard = () => {
                 disabled={isAiLoading || !photoBase64}
                 style={{
                   background: "#10b981",
-                  color: "#fff",
+                  color: "white",
                   padding: "14px",
                   borderRadius: "100px",
                   border: "none",
@@ -622,12 +686,13 @@ const Dashboard = () => {
                 {isAiLoading ? "SCANNING..." : "✨ AI SCAN"}
               </button>
             </div>
+
             {aiAdvice && (
               <div
                 style={{
-                  background: "rgba(34,197,94,0.1)",
+                  background: "rgba(34,197,94,0.12)",
                   border: "2px solid #22c55e",
-                  borderRadius: "20px",
+                  borderRadius: "24px",
                   padding: "20px",
                   marginBottom: "25px",
                 }}
@@ -641,9 +706,32 @@ const Dashboard = () => {
                 >
                   🤖 AI DETECTED: {aiDetectedSpecies}
                 </p>
-                <p style={{ fontSize: "0.95rem" }}>{aiAdvice}</p>
+                <p style={{ fontSize: "1rem", margin: "0 0 15px" }}>
+                  {aiAdvice}
+                </p>
+                <div
+                  style={{
+                    background: "rgba(59,130,246,0.15)",
+                    padding: "15px",
+                    borderRadius: "15px",
+                    border: "1px solid #3b82f6",
+                  }}
+                >
+                  <p
+                    style={{
+                      color: "#3b82f6",
+                      fontWeight: 900,
+                      margin: "0 0 5px",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    💊 FIRST AID
+                  </p>
+                  <p style={{ fontSize: "0.95rem", margin: 0 }}>{aiMeds}</p>
+                </div>
               </div>
             )}
+
             <form onSubmit={handleSubmit}>
               <input
                 value={form.location}
@@ -651,13 +739,13 @@ const Dashboard = () => {
                 style={{
                   width: "100%",
                   padding: "1.2rem",
-                  background: "#0a0a0a",
-                  border: "1px solid #222",
                   borderRadius: "15px",
                   marginBottom: "15px",
-                  color: "#fff",
+                  background: "#0a0a0a",
+                  color: "white",
+                  border: "1px solid #222",
                 }}
-                placeholder="Location landmark..."
+                placeholder="📍 Exact Landmark"
               />
               <textarea
                 value={form.description}
@@ -667,21 +755,21 @@ const Dashboard = () => {
                 style={{
                   width: "100%",
                   padding: "1.2rem",
-                  background: "#0a0a0a",
-                  border: "1px solid #222",
                   borderRadius: "15px",
                   marginBottom: "25px",
-                  color: "#fff",
+                  background: "#0a0a0a",
+                  color: "white",
+                  border: "1px solid #222",
                   minHeight: "100px",
                 }}
-                placeholder="Describe injury..."
+                placeholder="Describe injury details..."
               />
               <button
                 type="submit"
                 style={{
                   width: "100%",
                   background: "#f59e0b",
-                  color: "#fff",
+                  color: "white",
                   padding: "1.2rem",
                   borderRadius: "100px",
                   border: "none",
@@ -695,7 +783,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* ✅ PREMIUM OFFICIAL CERTIFICATE - EXACTLY AS PER SCREENSHOT 2 */}
+      {/* ✅ PREMIUM OFFICIAL CERTIFICATE - 100% RESTORED */}
       <div
         ref={certificateRef}
         style={{
@@ -771,7 +859,6 @@ const Dashboard = () => {
                   fontWeight: 900,
                   color: "#000080",
                   marginTop: "6px",
-                  letterSpacing: "1px",
                 }}
               >
                 SCAN TO VERIFY
@@ -780,28 +867,13 @@ const Dashboard = () => {
             <div style={{ textAlign: "right" }}>
               <img
                 src="/ashok.png"
-                style={{
-                  width: "65px",
-                  marginLeft: "auto",
-                  display: "block",
-                  marginBottom: "6px",
-                }}
+                style={{ width: "65px", marginLeft: "auto", display: "block" }}
                 alt="Emblem"
               />
-              <p
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 900,
-                  margin: 0,
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-              >
+              <p style={{ fontSize: "16px", fontWeight: 900, margin: 0 }}>
                 Ministry of Culture
               </p>
-              <p style={{ fontSize: "13px", margin: 0, color: "#444" }}>
-                Government of India
-              </p>
+              <p style={{ fontSize: "13px", margin: 0 }}>Government of India</p>
             </div>
           </div>
           <div style={{ textAlign: "center", flex: 1 }}>
@@ -821,19 +893,11 @@ const Dashboard = () => {
                 letterSpacing: "14px",
                 color: "#555",
                 margin: "8px 0 30px",
-                fontWeight: 400,
               }}
             >
               OF APPRECIATION
             </h3>
-            <p
-              style={{
-                fontSize: "18px",
-                color: "#888",
-                fontStyle: "italic",
-                margin: "0 0 10px",
-              }}
-            >
+            <p style={{ fontSize: "18px", color: "#888", fontStyle: "italic" }}>
               PROUDLY PRESENTED TO
             </p>
             <h2
@@ -844,7 +908,6 @@ const Dashboard = () => {
                 borderBottom: "3px solid #eee",
                 display: "inline-block",
                 padding: "0 80px 8px",
-                margin: "0 0 30px",
               }}
             >
               {user?.name}
@@ -900,21 +963,10 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <div
-            style={{
-              position: "absolute",
-              bottom: "25px",
-              left: "60px",
-              fontSize: "11px",
-              color: "#aaa",
-            }}
-          >
-            Verification ID: PAW-{user?._id?.slice(-6).toUpperCase()} •
-            pawalert.in
-          </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default Dashboard;
