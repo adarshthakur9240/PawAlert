@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+
 import api from "../configs/api.js";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";

@@ -1,30 +1,20 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
-import './index.css'
-import { ClerkProvider } from '@clerk/clerk-react'
-import { Provider } from 'react-redux'
-import store from './store/store'
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key")
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import { Provider } from "react-redux";
+import store from "./store/store.js";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { ClerkProvider } from "@clerk/clerk-react";
+import "./index.css";
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignInUrl="/dashboard" afterSignUpUrl="/dashboard">
     <Provider store={store}>
-      <ClerkProvider 
-        publishableKey={PUBLISHABLE_KEY} 
-        fallbackRedirectUrl="/dashboard"
-        signUpFallbackRedirectUrl="/dashboard"
-      >
-        <BrowserRouter> 
-          <App />
-        </BrowserRouter>
-      </ClerkProvider>
+      <BrowserRouter>
+        <App />
+        <Toaster position="top-right" />
+      </BrowserRouter>
     </Provider>
-  </React.StrictMode>,
-)
+  </ClerkProvider>
+);

@@ -1,32 +1,88 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
-import Home from './pages/Home'
-import Dashboard from './pages/Dashboard'
-import Support from './pages/Support'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import { Toaster } from 'react-hot-toast'
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "./store/authSlice.js";
+import api from "./configs/api.js";
+import LoadingBar from "react-top-loading-bar";
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Support from "./pages/Support.jsx";
+import Footer from "./components/Footer.jsx";
+import AppDownload from "./components/AppDownload.jsx";
 
-function App() {
+const App = () => {
+  const location = useLocation();
+  const [progress, setProgress] = useState(0);
+  const { user: clerkUser, isSignedIn, isLoaded } = useUser();
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
+
+  // Clerk user → Backend sync → JWT token
+  useEffect(() => {
+    const syncUser = async () => {
+      if (isSignedIn && clerkUser && !token) {
+        try {
+          const { data } = await api.post("/api/auth/clerk-sync", {
+            email: clerkUser.primaryEmailAddress?.emailAddress,
+            name: clerkUser.fullName || clerkUser.firstName,
+            clerkId: clerkUser.id,
+          });
+          if (data.token) {
+            dispatch(login({ user: data.user, token: data.token }));
+          }
+        } catch (err) {
+          console.error("Sync failed:", err);
+        }
+      }
+    };
+    if (isLoaded) syncUser();
+  }, [isSignedIn, clerkUser, isLoaded, token]);
+
+  useEffect(() => {
+    const pageTitles = {
+      "/": "PawAlert | Home",
+      "/dashboard": "PawAlert | Dashboard",
+      "/login": "PawAlert | Login",
+      "/register": "PawAlert | Join the Mission",
+      "/support": "PawAlert | Support",
+    };
+    document.title = pageTitles[location.pathname] || "PawAlert";
+    setProgress(30);
+    const t = setTimeout(() => setProgress(100), 200);
+    return () => clearTimeout(t);
+  }, [location.pathname]);
+
+  const hideFooterRoutes = ["/login", "/register", "/dashboard"];
+  const showFooter = !hideFooterRoutes.includes(location.pathname);
+
+  if (!isLoaded) return (
+    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ color: "#f59e0b", fontSize: "2rem" }}>🐾</div>
+    </div>
+  );
+
   return (
-    <>
-      <Toaster position="top-center" />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route 
-          path="/dashboard" 
-          element={
-            <>
-              <SignedIn><Dashboard /></SignedIn>
-              <SignedOut><Navigate to="/login" /></SignedOut>
-            </>
-          } 
-        />
-      </Routes>
-    </>
-  )
-}
-export default App
+    <div style={{ minHeight: "100vh", background: "#080808", color: "#fff" }}>
+      <LoadingBar color="#f97316" progress={progress} onLoaderFinished={() => setProgress(0)} height={3} containerStyle={{ zIndex: 1000000, position: "fixed", top: 0 }} />
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/privacy" element={<Home />} />
+          <Route path="/about" element={<Home />} />
+          <Route path="/terms" element={<Home />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
+      {location.pathname === "/" && <AppDownload />}
+      {showFooter && <Footer />}
+    </div>
+  );
+};
+export default App;
