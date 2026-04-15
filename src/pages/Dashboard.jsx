@@ -92,7 +92,6 @@ const Dashboard = () => {
     description: "",
   });
 
-  // Role Logic
   const userRole = user?.role?.toLowerCase();
   const isAdmin = userRole === "admin";
   const isGov = userRole === "gov" || userRole === "government" || isAdmin;
@@ -633,7 +632,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* FAB - ADD EMERGENCY */}
       <button
         onClick={() => setShowModal(true)}
         style={{

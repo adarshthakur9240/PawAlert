@@ -18,8 +18,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ClerkProvider 
         publishableKey={PUBLISHABLE_KEY} 
-        afterSignInUrl="/dashboard"
-        afterSignUpUrl="/dashboard"
+        fallbackRedirectUrl="/dashboard"
+        signUpFallbackRedirectUrl="/dashboard"
       >
         <BrowserRouter> 
           <App />
