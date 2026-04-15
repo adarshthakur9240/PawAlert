@@ -19,16 +19,10 @@ import {
   Sparkles,
   HeartPulse,
   AlertCircle,
-  ShieldCheck,
-  Crown,
-  Heart,
-  Home,
-  Edit,
-  Sun,
-  Moon,
   Activity,
   Zap,
-  Info,
+  Heart,
+  Home,
   Smartphone,
 } from "lucide-react";
 
@@ -75,16 +69,12 @@ const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark",
-  );
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoBase64, setPhotoBase64] = useState("");
   const [aiAdvice, setAiAdvice] = useState("");
   const [aiMeds, setAiMeds] = useState("");
   const [aiDetectedSpecies, setAiDetectedSpecies] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
-
   const [form, setForm] = useState({
     reporterName: "",
     animalType: "dog",
@@ -94,11 +84,14 @@ const Dashboard = () => {
   });
 
   const getRoleLabel = (r) => {
-    const rLower = r?.toLowerCase();
-    if (rLower === "admin") return "ADMIN";
-    if (rLower === "gov" || rLower === "government") return "GOI";
-    if (rLower === "ngo") return "NGO";
-    return "USER";
+    const rl = r?.toLowerCase();
+    return rl === "admin"
+      ? "ADMIN"
+      : rl === "gov"
+        ? "GOI"
+        : rl === "ngo"
+          ? "NGO"
+          : "USER";
   };
 
   const rescuedCount = reports.filter(
@@ -141,26 +134,21 @@ const Dashboard = () => {
       }
     };
     syncIdentity();
-  }, [isLoaded, isSignedIn, clerkUser, token, dispatch]);
+  }, [isLoaded, isSignedIn, clerkUser, token]);
 
   useEffect(() => {
     if (token) loadReports();
-    if (user) setForm((prev) => ({ ...prev, reporterName: user.name }));
   }, [token]);
-
   const loadReports = async () => {
     try {
       const { data } = await api.get("/api/reports");
       setReports(data);
-    } catch (e) {
-      toast.error("Fail!");
-    }
+    } catch (e) {}
   };
 
   const handleAiAnalysis = async () => {
-    if (!photoBase64) return toast.error("Capture photo!");
+    if (!photoBase64) return toast.error("Photo required!");
     setIsAiLoading(true);
-    setAiAdvice("");
     try {
       const { data } = await api.post("/api/ai/analyze-image", {
         image: photoBase64,
@@ -171,7 +159,7 @@ const Dashboard = () => {
       setAiMeds(data.firstAid);
       toast.success("AI Scanned!");
     } catch (err) {
-      toast.error("AI Fail");
+      toast.error("AI Error");
     } finally {
       setIsAiLoading(false);
     }
@@ -202,25 +190,31 @@ const Dashboard = () => {
       setShowModal(false);
       loadReports();
       toast.success("Alert Sent!");
-    } catch (err) {
-      toast.error("Fail!");
-    }
+    } catch (err) {}
   };
 
   const downloadCertificate = async () => {
+    if (rescuedCount < 1) return toast.error("Rescue 1 animal to unlock!");
     setIsDownloading(true);
     try {
       const el = certificateRef.current;
       el.style.left = "0px";
       el.style.position = "fixed";
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
+      el.style.top = "0px";
+      el.style.zIndex = "99999";
+      await new Promise((r) => setTimeout(r, 500));
+      const canvas = await html2canvas(el, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
       el.style.left = "-9999px";
       el.style.position = "absolute";
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("l", "mm", "a4");
       pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
-      pdf.save(`Certificate_${user?.name}.pdf`);
-      toast.success("Downloaded!");
+      pdf.save(`Official_Certificate_${user?.name}.pdf`);
+      toast.success("Certificate Secured! 🇮🇳");
     } catch (err) {
       toast.error("Error!");
     } finally {
@@ -234,161 +228,197 @@ const Dashboard = () => {
         minHeight: "100vh",
         background: "#0a0a0a",
         color: "#fff",
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
       <Navbar />
 
       <div
         style={{
-          maxWidth: "1200px",
-          margin: "90px auto 40px",
+          maxWidth: "1260px",
+          margin: "100px auto 40px",
           padding: "0 20px",
         }}
       >
-        {/* Header - Fixed Scale */}
+        {/* Header Section */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "2rem",
+            alignItems: "flex-end",
+            marginBottom: "2.5rem",
           }}
         >
           <div>
-            <h1 style={{ fontSize: "2rem", fontWeight: 900, margin: 0 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                color: "#f59e0b",
+                marginBottom: "8px",
+              }}
+            >
+              <Zap size={20} fill="#f59e0b" />
+              <span
+                style={{
+                  fontWeight: 800,
+                  fontSize: "0.9rem",
+                  letterSpacing: "1px",
+                }}
+              >
+                LIVE COMMAND CENTER
+              </span>
+            </div>
+            <h1
+              style={{
+                fontSize: "3rem",
+                fontWeight: 900,
+                margin: 0,
+                letterSpacing: "-2px",
+              }}
+            >
               Dashboard
             </h1>
-            <p style={{ opacity: 0.5, fontSize: "0.9rem" }}>
-              Live Command Center
-            </p>
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "10px",
+              gap: "12px",
               background: "#111",
-              padding: "8px 20px",
+              padding: "10px 25px",
               borderRadius: "100px",
               border: "1px solid #222",
             }}
           >
             <div
               style={{
-                height: "8px",
-                width: "8px",
+                height: "10px",
+                width: "10px",
                 borderRadius: "50%",
                 background: "#22c55e",
+                boxShadow: "0 0 10px #22c55e",
               }}
             ></div>
-            <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
-              [{getRoleLabel(user?.role)}] {user?.name}
+            <span style={{ fontWeight: 800, fontSize: "1rem" }}>
+              <span style={{ color: badge.color }}>
+                [{getRoleLabel(user?.role)}]
+              </span>{" "}
+              {user?.name}
             </span>
           </div>
         </div>
 
-        {/* Hero Card - Restored Button */}
+        {/* Hero Card */}
         <div
           style={{
             background: "#111",
-            border: `2px solid ${badge.color}`,
-            borderRadius: "24px",
-            padding: "2rem",
-            marginBottom: "2rem",
+            border: `2.5px solid ${badge.color}`,
+            borderRadius: "32px",
+            padding: "3rem",
+            marginBottom: "3rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: `0 20px 40px ${badge.color}10`,
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <span style={{ fontSize: "3rem" }}>{badge.icon}</span>
-            <div>
-              <h2 style={{ fontSize: "1.8rem", fontWeight: 900, margin: 0 }}>
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+              <span style={{ fontSize: "4rem" }}>{badge.icon}</span>
+              <h2
+                style={{
+                  fontSize: "2.8rem",
+                  fontWeight: 900,
+                  letterSpacing: "-2px",
+                }}
+              >
                 {badge.title}
               </h2>
-              <p style={{ opacity: 0.7, margin: "5px 0 0" }}>
-                You rescued <b>{rescuedCount}</b> animals.
-              </p>
             </div>
+            <p style={{ fontSize: "1.2rem", opacity: 0.8, marginTop: "10px" }}>
+              Saving lives together. You rescued <b>{rescuedCount}</b> animals.
+              🇮🇳
+            </p>
           </div>
           <button
             onClick={downloadCertificate}
             style={{
               background: "linear-gradient(45deg, #FF9933, #FFFFFF, #138808)",
               color: "#000080",
-              padding: "10px 25px",
+              padding: "15px 35px",
               borderRadius: "50px",
-              border: "none",
+              border: "2px solid navy",
               fontWeight: "900",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "10px",
             }}
           >
             {isDownloading ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2 className="animate-spin" />
             ) : (
               <>
-                <Trophy size={18} /> Recognition
+                <Trophy size={22} /> Recognition 🇮🇳
               </>
             )}
           </button>
         </div>
 
-        {/* Stats - Compact Scale */}
+        {/* Stats Row */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "1rem",
+            gap: "1.5rem",
             marginBottom: "3rem",
           }}
         >
           {[
             {
-              l: "Total Alerts",
+              l: "Total Reports",
               v: reports.length,
               c: "#3b82f6",
-              i: <Activity size={20} />,
+              i: <Activity size={22} />,
             },
             {
               l: "Pending Case",
               v: reports.filter((r) => r.status === "pending").length,
               c: "#ef4444",
-              i: <AlertCircle size={20} />,
+              i: <AlertCircle size={22} />,
             },
             {
-              l: "Rescued Lives",
+              l: "Successful Rescues",
               v: reports.filter((r) => r.status === "rescued").length,
               c: "#22c55e",
-              i: <Heart size={20} />,
+              i: <Heart size={22} />,
             },
             {
-              l: "Adopted",
+              l: "Adopted Homes",
               v: reports.filter((r) => r.status === "adopted").length,
               c: "#ec4899",
-              i: <Home size={20} />,
+              i: <Home size={22} />,
             },
           ].map((s) => (
             <div
               key={s.l}
               style={{
                 background: "#111",
-                borderRadius: "18px",
-                padding: "1.5rem",
+                borderRadius: "24px",
+                padding: "2rem",
                 border: "1px solid #222",
               }}
             >
-              <div style={{ color: s.c, marginBottom: "10px" }}>{s.i}</div>
-              <div style={{ fontSize: "1.8rem", fontWeight: 900, color: s.c }}>
+              <div style={{ color: s.c, marginBottom: "12px" }}>{s.i}</div>
+              <div style={{ fontSize: "2.5rem", fontWeight: 900, color: s.c }}>
                 {s.v}
               </div>
               <div
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "0.85rem",
                   opacity: 0.5,
                   fontWeight: 700,
                   textTransform: "uppercase",
@@ -400,12 +430,12 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Feed Grid */}
+        {/* Feed */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "2rem",
+            gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+            gap: "2.5rem",
           }}
         >
           {reports.map((r) => (
@@ -413,33 +443,32 @@ const Dashboard = () => {
               key={r._id}
               style={{
                 background: "#111",
-                borderRadius: "24px",
+                borderRadius: "32px",
                 overflow: "hidden",
                 border: "1px solid #222",
               }}
             >
               <img
                 src={r.photo}
-                style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                style={{ width: "100%", height: "240px", objectFit: "cover" }}
               />
-              <div style={{ padding: "1.5rem" }}>
-                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>
+              <div style={{ padding: "2rem" }}>
+                <h3 style={{ fontWeight: 800, fontSize: "1.4rem" }}>
                   {SPECIES_EMOJIS[r.animalType] || "🐾"}{" "}
-                  {r.animalType?.toUpperCase()}
+                  {r.animalType?.toUpperCase()} ALERT
                 </h3>
-                <p
-                  style={{ opacity: 0.5, fontSize: "0.85rem", margin: "8px 0" }}
-                >
-                  <MapPin size={14} /> {r.location}
+                <p style={{ opacity: 0.6 }}>
+                  <MapPin size={18} color="#f59e0b" /> {r.location}
                 </p>
                 {r.aiAdvice && (
                   <div
                     style={{
-                      background: "#051505",
-                      padding: "10px",
-                      borderRadius: "10px",
+                      background: "rgba(34,197,94,0.1)",
+                      padding: "1.2rem",
+                      borderRadius: "16px",
+                      marginTop: "1rem",
                       border: "1px solid #1a331a",
-                      fontSize: "0.8rem",
+                      fontSize: "0.9rem",
                       color: "#4ade80",
                     }}
                   >
@@ -452,30 +481,29 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Centered FAB */}
+      {/* FAB */}
       <button
         onClick={() => setShowModal(true)}
         style={{
           position: "fixed",
-          bottom: "30px",
-          right: "30px",
+          bottom: "40px",
+          right: "40px",
           background: "#f59e0b",
-          color: "#fff",
-          width: "65px",
-          height: "65px",
+          width: "80px",
+          height: "80px",
           borderRadius: "50%",
-          zIndex: 1000,
+          border: "none",
+          cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          border: "none",
-          boxShadow: "0 10px 30px rgba(245,158,11,0.4)",
+          boxShadow: "0 15px 35px rgba(245,158,11,0.5)",
         }}
       >
-        <Plus size={35} strokeWidth={3} />
+        <Plus size={45} strokeWidth={3} color="white" />
       </button>
 
-      {/* Modal - Fixed Camera & AI Box */}
+      {/* Modal */}
       {showModal && (
         <div
           style={{
@@ -487,15 +515,16 @@ const Dashboard = () => {
             alignItems: "center",
             justifyContent: "center",
             padding: "20px",
+            backdropFilter: "blur(15px)",
           }}
         >
           <div
             style={{
               background: "#111",
               width: "100%",
-              maxWidth: "500px",
-              borderRadius: "24px",
-              padding: "25px",
+              maxWidth: "550px",
+              borderRadius: "35px",
+              padding: "40px",
               border: "1px solid #222",
               maxHeight: "90vh",
               overflowY: "auto",
@@ -505,29 +534,30 @@ const Dashboard = () => {
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                marginBottom: "20px",
+                marginBottom: "30px",
               }}
             >
-              <h2 style={{ margin: 0, fontSize: "1.5rem" }}>
-                Report Emergency
+              <h2 style={{ fontSize: "2.2rem", fontWeight: 900 }}>
+                New Emergency
               </h2>
               <X
                 onClick={() => setShowModal(false)}
                 style={{ cursor: "pointer", opacity: 0.5 }}
+                size={30}
               />
             </div>
             <div
               onClick={() => fileInputRef.current.click()}
               style={{
-                height: "180px",
-                border: "2px dashed #333",
-                borderRadius: "15px",
+                height: "220px",
+                border: "3px dashed #222",
+                borderRadius: "25px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
                 background: "#0a0a0a",
-                marginBottom: "20px",
+                marginBottom: "25px",
                 overflow: "hidden",
               }}
             >
@@ -537,7 +567,7 @@ const Dashboard = () => {
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               ) : (
-                <Camera size={40} opacity={0.3} />
+                <Camera size={50} opacity={0.3} />
               )}
             </div>
             <input
@@ -550,9 +580,9 @@ const Dashboard = () => {
                 const file = e.target.files[0];
                 if (file) {
                   setPhotoPreview(URL.createObjectURL(file));
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file);
-                  reader.onloadend = () => setPhotoBase64(reader.result);
+                  const r = new FileReader();
+                  r.readAsDataURL(file);
+                  r.onloadend = () => setPhotoBase64(r.result);
                 }
               }}
             />
@@ -560,8 +590,8 @@ const Dashboard = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                gap: "10px",
-                marginBottom: "20px",
+                gap: "15px",
+                marginBottom: "25px",
               }}
             >
               <button
@@ -569,13 +599,13 @@ const Dashboard = () => {
                 style={{
                   background: "#3b82f6",
                   color: "#fff",
-                  padding: "10px",
-                  borderRadius: "50px",
+                  padding: "14px",
+                  borderRadius: "100px",
                   border: "none",
-                  fontWeight: "bold",
+                  fontWeight: "900",
                 }}
               >
-                📍 GPS
+                📍 GPS LOCK
               </button>
               <button
                 onClick={handleAiAnalysis}
@@ -583,36 +613,35 @@ const Dashboard = () => {
                 style={{
                   background: "#10b981",
                   color: "#fff",
-                  padding: "10px",
-                  borderRadius: "50px",
+                  padding: "14px",
+                  borderRadius: "100px",
                   border: "none",
-                  fontWeight: "bold",
+                  fontWeight: "900",
                 }}
               >
-                {isAiLoading ? "..." : "✨ AI Scan"}
+                {isAiLoading ? "SCANNING..." : "✨ AI SCAN"}
               </button>
             </div>
             {aiAdvice && (
               <div
                 style={{
-                  background: "#051505",
-                  border: "1px solid #1a331a",
-                  borderRadius: "15px",
-                  padding: "15px",
-                  marginBottom: "20px",
+                  background: "rgba(34,197,94,0.1)",
+                  border: "2px solid #22c55e",
+                  borderRadius: "20px",
+                  padding: "20px",
+                  marginBottom: "25px",
                 }}
               >
                 <p
                   style={{
-                    color: "#4ade80",
+                    color: "#22c55e",
                     fontWeight: 900,
                     margin: "0 0 5px",
-                    fontSize: "0.75rem",
                   }}
                 >
-                  🤖 AI: {aiDetectedSpecies}
+                  🤖 AI DETECTED: {aiDetectedSpecies}
                 </p>
-                <p style={{ fontSize: "0.8rem", opacity: 0.8 }}>{aiAdvice}</p>
+                <p style={{ fontSize: "0.95rem" }}>{aiAdvice}</p>
               </div>
             )}
             <form onSubmit={handleSubmit}>
@@ -621,14 +650,14 @@ const Dashboard = () => {
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 style={{
                   width: "100%",
-                  padding: "12px",
+                  padding: "1.2rem",
                   background: "#0a0a0a",
                   border: "1px solid #222",
-                  borderRadius: "10px",
-                  marginBottom: "10px",
+                  borderRadius: "15px",
+                  marginBottom: "15px",
                   color: "#fff",
                 }}
-                placeholder="Location"
+                placeholder="Location landmark..."
               />
               <textarea
                 value={form.description}
@@ -637,15 +666,15 @@ const Dashboard = () => {
                 }
                 style={{
                   width: "100%",
-                  padding: "12px",
+                  padding: "1.2rem",
                   background: "#0a0a0a",
                   border: "1px solid #222",
-                  borderRadius: "10px",
-                  marginBottom: "20px",
+                  borderRadius: "15px",
+                  marginBottom: "25px",
                   color: "#fff",
-                  minHeight: "80px",
+                  minHeight: "100px",
                 }}
-                placeholder="Details"
+                placeholder="Describe injury..."
               />
               <button
                 type="submit"
@@ -653,20 +682,20 @@ const Dashboard = () => {
                   width: "100%",
                   background: "#f59e0b",
                   color: "#fff",
-                  padding: "12px",
-                  borderRadius: "50px",
+                  padding: "1.2rem",
+                  borderRadius: "100px",
                   border: "none",
                   fontWeight: "900",
                 }}
               >
-                SUBMIT 🐾
+                SUBMIT ALERT 🐾
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Certificate UI (Hidden) */}
+      {/* ✅ PREMIUM OFFICIAL CERTIFICATE - EXACTLY AS PER SCREENSHOT 2 */}
       <div
         ref={certificateRef}
         style={{
@@ -676,22 +705,214 @@ const Dashboard = () => {
           width: "1123px",
           height: "794px",
           background: "white",
+          overflow: "hidden",
+          fontFamily: "'Playfair Display', serif",
           color: "#000",
-          textAlign: "center",
-          padding: "80px",
         }}
       >
-        <img src="/ashok.png" style={{ width: "60px" }} />
-        <h1 style={{ fontSize: "60px", margin: "20px 0" }}>CERTIFICATE</h1>
-        <h2 style={{ fontSize: "40px", color: "#D4762A" }}>{user?.name}</h2>
-        <p style={{ fontSize: "20px" }}>
-          For rescuing animals via <b>PawAlert</b>.
-        </p>
-        <QRCodeSVG
-          value={`https://pawalert.in/verify/${user?._id}`}
-          size={100}
-          style={{ marginTop: "20px" }}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "220px",
+            height: "160px",
+            background: "linear-gradient(135deg, #FF9933 50%, transparent 50%)",
+            zIndex: 1,
+          }}
         />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            width: "220px",
+            height: "160px",
+            background: "linear-gradient(-45deg, #138808 50%, transparent 50%)",
+            zIndex: 1,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: "20px",
+            border: "10px double #D4AF37",
+            zIndex: 2,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: "20px",
+            padding: "50px 60px 40px",
+            zIndex: 3,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ textAlign: "center" }}>
+              <QRCodeSVG
+                value={`https://pawalert.in/verify/${user?._id}`}
+                size={110}
+                level="H"
+                includeMargin={true}
+              />
+              <p
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 900,
+                  color: "#000080",
+                  marginTop: "6px",
+                  letterSpacing: "1px",
+                }}
+              >
+                SCAN TO VERIFY
+              </p>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <img
+                src="/ashok.png"
+                style={{
+                  width: "65px",
+                  marginLeft: "auto",
+                  display: "block",
+                  marginBottom: "6px",
+                }}
+                alt="Emblem"
+              />
+              <p
+                style={{
+                  fontSize: "16px",
+                  fontWeight: 900,
+                  margin: 0,
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Ministry of Culture
+              </p>
+              <p style={{ fontSize: "13px", margin: 0, color: "#444" }}>
+                Government of India
+              </p>
+            </div>
+          </div>
+          <div style={{ textAlign: "center", flex: 1 }}>
+            <h1
+              style={{
+                fontSize: "90px",
+                fontWeight: 900,
+                margin: "0",
+                lineHeight: 1,
+              }}
+            >
+              CERTIFICATE
+            </h1>
+            <h3
+              style={{
+                fontSize: "22px",
+                letterSpacing: "14px",
+                color: "#555",
+                margin: "8px 0 30px",
+                fontWeight: 400,
+              }}
+            >
+              OF APPRECIATION
+            </h3>
+            <p
+              style={{
+                fontSize: "18px",
+                color: "#888",
+                fontStyle: "italic",
+                margin: "0 0 10px",
+              }}
+            >
+              PROUDLY PRESENTED TO
+            </p>
+            <h2
+              style={{
+                fontSize: "68px",
+                fontStyle: "italic",
+                color: "#D4762A",
+                borderBottom: "3px solid #eee",
+                display: "inline-block",
+                padding: "0 80px 8px",
+                margin: "0 0 30px",
+              }}
+            >
+              {user?.name}
+            </h2>
+            <p
+              style={{
+                fontSize: "17px",
+                lineHeight: 1.8,
+                maxWidth: "820px",
+                margin: "0 auto",
+                textTransform: "uppercase",
+                fontWeight: 600,
+              }}
+            >
+              For successfully rescuing <b>{rescuedCount} stray animals</b>{" "}
+              through <b>PawAlert</b>.<br />
+              An exemplary contribution to make India safer for every living
+              being.
+            </p>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ textAlign: "center", width: "260px" }}>
+              <p
+                style={{
+                  fontSize: "14px",
+                  margin: "0 0 4px",
+                  textAlign: "left",
+                }}
+              >
+                Founder,
+              </p>
+              <img
+                src="/adarsh_sign-removebg-preview.png"
+                alt="Signature"
+                style={{
+                  width: "200px",
+                  height: "70px",
+                  objectFit: "contain",
+                  display: "block",
+                }}
+              />
+              <div
+                style={{
+                  height: "2px",
+                  background: "#1a1a1a",
+                  width: "100%",
+                  margin: "4px 0",
+                }}
+              />
+              <p style={{ fontSize: "16px", fontWeight: 900 }}>Adarsh Thakur</p>
+              <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>
+                Authorized Signatory, PawAlert Network
+              </p>
+            </div>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "25px",
+              left: "60px",
+              fontSize: "11px",
+              color: "#aaa",
+            }}
+          >
+            Verification ID: PAW-{user?._id?.slice(-6).toUpperCase()} •
+            pawalert.in
+          </div>
+        </div>
       </div>
     </div>
   );
