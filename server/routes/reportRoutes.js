@@ -1,7 +1,7 @@
 import express from "express";
 import { 
   createReport, 
-  getAllReports, 
+  getReports, 
   upvoteReport, 
   updateStatus, 
   updateReport // 🔥 Naya import yahan add ho gaya
@@ -11,7 +11,7 @@ import auth from "../middleware/auth.js";
 const router = express.Router();
 
 // Public routes
-router.get("/", getAllReports);
+router.get("/", getReports);
 
 // Protected routes (Login zaroori hai)
 router.post("/", auth, createReport);

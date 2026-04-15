@@ -1,13 +1,16 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useClerk } from '@clerk/clerk-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { signOut } = useClerk();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     dispatch({ type: 'auth/logout' });
     localStorage.removeItem('user');
     localStorage.removeItem('token');
