@@ -7,6 +7,7 @@ import { dirname, join } from "path";
 import authRoutes from "./routes/authRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import clerkSyncRoutes from "./routes/clerkSync.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,6 +25,7 @@ app.use(cors({
   ],
   credentials: true
 }));
+
 app.use(express.json({ limit: "10mb" }));
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -31,6 +33,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch((err) => console.log("DB Error:", err));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", clerkSyncRoutes); 
 app.use("/api/reports", reportRoutes);
 app.use("/api/ai", aiRoutes);
 
