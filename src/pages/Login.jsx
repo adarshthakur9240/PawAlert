@@ -4,53 +4,77 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", fontFamily: "Inter, sans-serif" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "#080808",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "32px 20px",
+      fontFamily: "Inter, sans-serif",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        backgroundImage: "radial-gradient(rgba(249,115,22,0.06) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      }} />
+      <div style={{
+        position: "absolute", top: "20%", left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "700px", height: "700px", pointerEvents: "none",
+        background: "radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 65%)",
+      }} />
+
       <style>{`
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        .clerk-wrap { animation: fadeUp 0.5s ease both; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @keyframes fadeUp {
+          from { opacity:0; transform:translateY(28px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        .lw { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; width:100%; max-width:460px; display:flex; flex-direction:column; align-items:center; position:relative; z-index:1; }
+        .paw-badge { display:inline-flex; align-items:center; gap:7px; background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.2); color:#f97316; font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:6px 18px; border-radius:100px; margin-bottom:22px; }
       `}</style>
-      <div className="clerk-wrap">
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🐾</div>
-          <h1 style={{ fontSize: "2rem", fontWeight: 900, color: "#fff", fontFamily: "Georgia, serif", margin: "0 0 6px", letterSpacing: "-1px" }}>Login to Mission</h1>
-          <p style={{ color: "#71717a", fontSize: "0.9rem", margin: 0 }}>Welcome back, savior!</p>
+
+      <div className="lw">
+        <div className="paw-badge">🐾 PawAlert India</div>
+        <h1 style={{
+          fontFamily: "Playfair Display, serif",
+          fontSize: "clamp(1.9rem,5vw,2.5rem)",
+          fontWeight: 900, color: "#fff",
+          margin: "0 0 8px", letterSpacing: "-0.03em",
+          textAlign: "center", lineHeight: 1.1,
+        }}>
+          Welcome Back, Savior
+        </h1>
+        <div style={{ width: "100%" }}>
+          <SignIn
+            routing="path"
+            path="/login"
+            signUpUrl="/register"
+            fallbackRedirectUrl="/dashboard"
+            appearance={{
+              variables: {
+                colorPrimary: "#f97316",
+                colorBackground: "#111111",
+                borderRadius: "14px",
+              },
+              elements: {
+                rootBox: "w-full",
+                card: "shadow-none !border !border-[#1f1f1f] !rounded-[24px] !bg-[#111111]",
+                header: "hidden",
+                footer: "hidden",
+              },
+            }}
+          />
         </div>
-        <SignIn
-          routing="hash"
-          redirectUrl="/dashboard"
-          appearance={{
-            variables: {
-              colorPrimary: "#f59e0b",
-              colorBackground: "#111111",
-              colorInputBackground: "#0a0a0a",
-              colorInputText: "#ffffff",
-              colorText: "#ffffff",
-              colorTextSecondary: "#a1a1aa",
-              borderRadius: "14px",
-              fontFamily: "Inter, sans-serif",
-            },
-            elements: {
-              rootBox: "w-full max-w-[440px]",
-              card: "shadow-none border border-zinc-800 rounded-[28px] bg-[#111111]",
-              headerTitle: "hidden",
-              headerSubtitle: "hidden",
-              header: "hidden",
-              socialButtonsBlockButton: "border border-zinc-700 bg-zinc-900/80 text-white hover:bg-zinc-800 rounded-[14px] font-semibold",
-              socialButtonsBlockButtonText: "text-white font-semibold",
-              dividerLine: "bg-zinc-700",
-              dividerText: "text-zinc-500 text-xs",
-              formFieldLabel: "text-zinc-400 text-xs font-bold uppercase tracking-widest",
-              formFieldInput: "bg-black border border-zinc-800 text-white rounded-[14px] focus:border-orange-500 focus:ring-0",
-              formButtonPrimary: "bg-orange-500 hover:bg-orange-600 text-black font-black uppercase tracking-widest rounded-[14px] py-3",
-              footerActionLink: "text-orange-500 hover:text-orange-400 font-bold",
-              footerActionText: "text-zinc-500",
-              identityPreviewText: "text-white",
-              formFieldSuccessText: "text-green-400",
-              alertText: "text-red-400",
-              internal: "bg-[#111111]",
-            }
-          }}
-        />
+        <p style={{ color: "#3f3f46", fontSize: "0.8rem", marginTop: "24px", textAlign: "center" }}>
+          New to PawAlert?{" "}
+          <Link to="/register" style={{ color: "#f97316", fontWeight: 700, textDecoration: "none" }}>
+            Join the Mission →
+          </Link>
+        </p>
       </div>
     </div>
   );
