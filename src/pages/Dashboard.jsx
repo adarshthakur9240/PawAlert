@@ -26,6 +26,16 @@ import {
   Edit,
   Sun,
   Moon,
+  Activity,
+  Zap,
+  Info,
+  Shield,
+  Settings,
+  User,
+  LogOut,
+  CheckCircle,
+  Clock,
+  ExternalLink,
 } from "lucide-react";
 
 const SPECIES_EMOJIS = {
@@ -57,7 +67,6 @@ const Dashboard = () => {
   const fileInputRef = useRef(null);
   const certificateRef = useRef(null);
 
-  // ✅ Hybrid Identity Sync
   const user =
     reduxUser ||
     (clerkUser
@@ -125,7 +134,7 @@ const Dashboard = () => {
   };
   const badge = getAward(rescuedCount);
 
-  // ✅ IDENTITY SYNC LOGIC
+  // ✅ IDENTITY SYNC EFFECT
   useEffect(() => {
     const syncIdentity = async () => {
       if (isLoaded && isSignedIn && clerkUser && !token) {
@@ -141,7 +150,6 @@ const Dashboard = () => {
               type: "auth/loginSuccess",
               payload: { user: data.user, token: data.token },
             });
-            toast.success("Identity Synced! 🐾");
           }
         } catch (err) {
           console.error("Sync Error");
@@ -169,41 +177,26 @@ const Dashboard = () => {
     }
   };
 
-  const updateStatus = async (id, newStatus) => {
-    try {
-      await api.put(
-        `/api/reports/${id}/status`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      loadReports();
-      toast.success(`${newStatus.toUpperCase()} updated! ✅`);
-    } catch (e) {
-      toast.error("Action Failed!");
-    }
-  };
-
   const handleAiAnalysis = async () => {
     if (!photoBase64) return toast.error("Capture photo first!");
     setIsAiLoading(true);
+    setAiAdvice("");
     try {
       const { data } = await api.post("/api/ai/analyze-image", {
         image: photoBase64,
         description: form.description,
       });
-      setAiDetectedSpecies(data.species || "Other");
-      setAiAdvice(data.medicationAdvice || "Expert review required.");
-      setAiMeds(data.firstAid || "Keep animal stable.");
+      setAiDetectedSpecies(data.species);
+      setAiAdvice(data.medicationAdvice);
+      setAiMeds(data.firstAid);
       setForm((prev) => ({
         ...prev,
         animalType: data.species?.toLowerCase() || "other",
-        urgency: data.urgency?.toLowerCase() || "medium",
+        urgency: data.urgency || "medium",
       }));
-      toast.success(`AI: ${data.species} detected! 🐾`);
+      toast.success("AI Scan Complete!");
     } catch (err) {
-      toast.error("AI scan failed.");
+      toast.error("AI Scan failed.");
     } finally {
       setIsAiLoading(false);
     }
@@ -229,97 +222,17 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!photoBase64) return toast.error("Photo required!");
     try {
       const payload = { ...form, photo: photoBase64, aiAdvice, aiMeds };
-      if (editingReport) {
-        await api.put(`/api/reports/${editingReport._id}`, payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        toast.success("Report updated! ✅");
-      } else {
-        await api.post("/api/reports", payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        toast.success("Emergency Alert Sent! 🐾");
-      }
-      closeModal();
+      await api.post("/api/reports", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setShowModal(false);
       loadReports();
+      toast.success("Emergency Alert Sent! 🐾");
     } catch (err) {
       toast.error("Submission failed!");
     }
-  };
-
-  const handleEditClick = (report) => {
-    setEditingReport(report);
-    setForm({
-      reporterName: report.reporterName,
-      animalType: report.animalType,
-      urgency: report.urgency,
-      location: report.location,
-      description: report.description || "",
-    });
-    setPhotoPreview(report.photo);
-    setPhotoBase64(report.photo || "");
-    setAiAdvice(report.aiAdvice || "");
-    setAiMeds(report.aiMeds || "");
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingReport(null);
-    setPhotoPreview(null);
-    setPhotoBase64("");
-    setAiAdvice("");
-    setAiMeds("");
-    setAiDetectedSpecies("");
-    setForm((prev) => ({
-      ...prev,
-      description: "",
-      location: "",
-      animalType: "dog",
-      urgency: "low",
-    }));
-  };
-
-  const downloadCertificate = async () => {
-    if (rescuedCount < 1) return toast.error("Rescue at least 1 animal first!");
-    setIsDownloading(true);
-    try {
-      const el = certificateRef.current;
-      el.style.left = "0px";
-      el.style.position = "fixed";
-      el.style.top = "0px";
-      el.style.zIndex = "99999";
-      await new Promise((r) => setTimeout(r, 500));
-      const canvas = await html2canvas(el, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
-      el.style.left = "-9999px";
-      el.style.position = "absolute";
-      el.style.zIndex = "auto";
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("l", "mm", "a4");
-      pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
-      pdf.save(`GOI_PawAlert_${user?.name}.pdf`);
-      toast.success("Certificate downloaded! 🇮🇳");
-    } catch (err) {
-      toast.error("Download failed!");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const selectStyle = {
-    padding: "0.9rem",
-    borderRadius: "12px",
-    background: "var(--bg-card)",
-    color: "var(--text-main)",
-    border: "1px solid var(--border)",
-    width: "100%",
   };
 
   return (
@@ -340,113 +253,211 @@ const Dashboard = () => {
           padding: "0 20px",
         }}
       >
-        {/* HERO CARD - THE LEGACY UI */}
+        {/* ✅ DYNAMIC HEADER WITH ROLE BRANDING */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginBottom: "2.5rem",
+          }}
+        >
+          <div style={{ animation: "slideInLeft 0.8s ease" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                color: "#f59e0b",
+                marginBottom: "8px",
+              }}
+            >
+              <Zap size={20} fill="#f59e0b" />
+              <span
+                style={{
+                  fontWeight: 800,
+                  fontSize: "0.9rem",
+                  letterSpacing: "1px",
+                }}
+              >
+                LIVE COMMAND CENTER
+              </span>
+            </div>
+            <h1
+              style={{
+                fontSize: "3.2rem",
+                fontWeight: 900,
+                margin: 0,
+                letterSpacing: "-2px",
+                lineHeight: 1,
+              }}
+            >
+              Dashboard
+            </h1>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "15px",
+              background: "var(--bg-card)",
+              padding: "12px 28px",
+              borderRadius: "100px",
+              border: "1px solid var(--border)",
+              boxShadow: "0 15px 35px rgba(0,0,0,0.2)",
+              animation: "slideInRight 0.8s ease",
+            }}
+          >
+            <div
+              style={{
+                height: "12px",
+                width: "12px",
+                borderRadius: "50%",
+                background: "#22c55e",
+                boxShadow: "0 0 15px #22c55e",
+              }}
+            ></div>
+            <span style={{ fontWeight: 800, fontSize: "1rem" }}>
+              <span style={{ color: badge.color }}>
+                [{getRoleLabel(user?.role)}]
+              </span>{" "}
+              {user?.name}
+            </span>
+          </div>
+        </div>
+
+        {/* HERO CARD - HEAVY UI */}
         <div
           style={{
             background: "var(--bg-card)",
             border: `2.5px solid ${badge.color}`,
-            borderRadius: "32px",
-            padding: "3rem",
-            marginBottom: "3.5rem",
+            borderRadius: "35px",
+            padding: "3.5rem",
+            marginBottom: "4rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: `0 20px 50px ${badge.color}15`,
+            boxShadow: `0 30px 70px ${badge.color}15`,
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              <span style={{ fontSize: "3rem" }}>{badge.icon}</span>
-              <h2
-                style={{
-                  fontSize: "2.6rem",
-                  fontWeight: 900,
-                  letterSpacing: "-1.5px",
-                }}
-              >
-                {badge.title}
-              </h2>
-            </div>
-            <p style={{ fontSize: "1.2rem", opacity: 0.8, marginTop: "10px" }}>
-              Welcome back{" "}
-              <b style={{ color: badge.color }}>{getRoleLabel(user?.role)}</b>{" "}
-              {user?.name}. You rescued <b>{rescuedCount}</b> animals. 🇮🇳
-            </p>
-          </div>
-          <button
-            onClick={downloadCertificate}
+          <div
             style={{
-              background: "linear-gradient(45deg, #FF9933, #FFFFFF, #138808)",
-              color: "#000080",
-              padding: "16px 32px",
-              borderRadius: "50px",
-              border: "2px solid navy",
-              fontWeight: "900",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
+              position: "absolute",
+              top: "-50px",
+              right: "-50px",
+              opacity: 0.03,
             }}
           >
-            {isDownloading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <>
-                <Trophy size={22} /> Recognition 🇮🇳
-              </>
-            )}
-          </button>
+            <Trophy size={400} />
+          </div>
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "25px" }}>
+              <div
+                style={{
+                  background: `${badge.color}20`,
+                  padding: "20px",
+                  borderRadius: "24px",
+                }}
+              >
+                <span style={{ fontSize: "4rem" }}>{badge.icon}</span>
+              </div>
+              <div>
+                <h2
+                  style={{
+                    fontSize: "3.5rem",
+                    fontWeight: 900,
+                    letterSpacing: "-3px",
+                    margin: 0,
+                  }}
+                >
+                  {badge.title}
+                </h2>
+                <p
+                  style={{
+                    fontSize: "1.4rem",
+                    opacity: 0.7,
+                    marginTop: "10px",
+                    fontWeight: 500,
+                  }}
+                >
+                  You have saved <b>{rescuedCount}</b> lives so far. India is
+                  proud of you! 🇮🇳
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* STATS ROW */}
+        {/* DETAILED STATS ROW */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "1rem",
-            marginBottom: "2.5rem",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "1.5rem",
+            marginBottom: "4rem",
           }}
         >
           {[
-            { label: "Total Reports", value: reports.length, color: "#3b82f6" },
             {
-              label: "🔴 Pending",
+              label: "Total Alerts",
+              value: reports.length,
+              color: "#3b82f6",
+              icon: <Activity size={24} />,
+            },
+            {
+              label: "Emergency Pending",
               value: reports.filter((r) => r.status === "pending").length,
               color: "#ef4444",
+              icon: <AlertCircle size={24} />,
             },
             {
-              label: "✅ Rescued",
+              label: "Successful Rescues",
               value: reports.filter((r) => r.status === "rescued").length,
               color: "#22c55e",
+              icon: <Heart size={24} />,
             },
             {
-              label: "🏠 Sheltered",
-              value: reports.filter((r) => r.status === "sheltered").length,
-              color: "#8b5cf6",
-            },
-            {
-              label: "❤️ Adopted",
+              label: "Adopted Homes",
               value: reports.filter((r) => r.status === "adopted").length,
               color: "#ec4899",
+              icon: <Home size={24} />,
             },
           ].map((s) => (
             <div
               key={s.label}
               style={{
                 background: "var(--bg-card)",
-                borderRadius: "20px",
-                padding: "1.2rem",
-                border: `1px solid ${s.color}30`,
-                textAlign: "center",
+                borderRadius: "28px",
+                padding: "2rem",
+                border: `1px solid ${s.color}20`,
+                transition: "transform 0.3s ease",
               }}
             >
+              <div style={{ color: s.color, marginBottom: "15px" }}>
+                {s.icon}
+              </div>
               <div
-                style={{ fontSize: "2rem", fontWeight: 900, color: s.color }}
+                style={{
+                  fontSize: "2.8rem",
+                  fontWeight: 900,
+                  color: s.color,
+                  lineHeight: 1,
+                }}
               >
                 {s.value}
               </div>
               <div
-                style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "4px" }}
+                style={{
+                  fontSize: "0.85rem",
+                  opacity: 0.5,
+                  fontWeight: 800,
+                  marginTop: "8px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
               >
                 {s.label}
               </div>
@@ -454,259 +465,244 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* FEED GRID */}
-        <h2
+        {/* FEED SECTION */}
+        <div
           style={{
-            fontSize: "1.8rem",
-            fontWeight: 800,
-            marginBottom: "1.5rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "2.5rem",
           }}
         >
-          🐾 Activity Feed
-        </h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <Zap size={32} color="#f59e0b" fill="#f59e0b" />
+            <h2
+              style={{
+                fontSize: "2.2rem",
+                fontWeight: 900,
+                margin: 0,
+                letterSpacing: "-1px",
+              }}
+            >
+              Activity Feed
+            </h2>
+          </div>
+        </div>
+
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-            gap: "2rem",
+            gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
+            gap: "3rem",
           }}
         >
-          {reports.length === 0 ? (
+          {reports.map((report) => (
             <div
+              key={report._id}
               style={{
-                gridColumn: "1/-1",
-                textAlign: "center",
-                padding: "4rem",
-                opacity: 0.5,
+                background: "var(--bg-card)",
+                borderRadius: "35px",
+                overflow: "hidden",
+                border: "1px solid var(--border)",
+                position: "relative",
+                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               }}
             >
-              <div style={{ fontSize: "5rem" }}>🐾</div>
-              <p style={{ fontSize: "1.2rem", fontWeight: 600 }}>
-                No reports yet. Be the first!
-              </p>
-            </div>
-          ) : (
-            reports.map((report) => (
               <div
-                key={report._id}
                 style={{
-                  background: "var(--bg-card)",
-                  borderRadius: "28px",
-                  overflow: "hidden",
-                  border: "1px solid var(--border)",
-                  position: "relative",
+                  position: "absolute",
+                  top: "25px",
+                  left: "25px",
+                  zIndex: 10,
                 }}
               >
-                <div
+                <span
                   style={{
-                    position: "absolute",
-                    top: "15px",
-                    left: "15px",
-                    zIndex: 10,
+                    padding: "10px 20px",
+                    borderRadius: "100px",
+                    fontSize: "0.8rem",
+                    fontWeight: 900,
+                    background: STATUS_COLORS[report.status] || "#6b7280",
+                    color: "#fff",
+                    textTransform: "uppercase",
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.4)",
                   }}
                 >
-                  <span
-                    style={{
-                      padding: "6px 14px",
-                      borderRadius: "20px",
-                      fontSize: "0.72rem",
-                      fontWeight: 900,
-                      background: STATUS_COLORS[report.status] || "#6b7280",
-                      color: "#fff",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {report.status}
-                  </span>
-                </div>
-                <img
-                  src={report.photo}
-                  style={{ width: "100%", height: "220px", objectFit: "cover" }}
-                  alt="animal"
-                />
-                <div style={{ padding: "1.5rem" }}>
+                  {report.status}
+                </span>
+              </div>
+              <img
+                src={report.photo}
+                style={{ width: "100%", height: "280px", objectFit: "cover" }}
+                alt="animal"
+              />
+              <div style={{ padding: "2.5rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "15px",
+                  }}
+                >
                   <h3
-                    style={{
-                      fontWeight: 800,
-                      fontSize: "1.2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
+                    style={{ fontWeight: 900, fontSize: "1.6rem", margin: 0 }}
                   >
                     {SPECIES_EMOJIS[report.animalType] || "🐾"}{" "}
-                    {report.animalType?.toUpperCase()} Alert
+                    {report.animalType?.toUpperCase()}
                   </h3>
-                  <p
+                  <div
                     style={{
-                      fontSize: "0.9rem",
-                      opacity: 0.7,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
+                      background: "rgba(255,255,255,0.05)",
+                      padding: "8px",
+                      borderRadius: "12px",
                     }}
                   >
-                    <MapPin size={14} /> {report.location}
-                  </p>
-
-                  {report.aiAdvice && (
-                    <div
-                      style={{
-                        background: "rgba(34,197,94,0.08)",
-                        border: "1px solid #22c55e30",
-                        borderRadius: "12px",
-                        padding: "0.7rem",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#16a34a",
-                          fontWeight: 700,
-                          margin: "0 0 4px",
-                        }}
-                      >
-                        🤖 AI Advice
-                      </p>
-                      <p
-                        style={{ fontSize: "0.78rem", margin: 0, opacity: 0.8 }}
-                      >
-                        {report.aiAdvice}
-                      </p>
-                    </div>
-                  )}
-
-                  <div
-                    style={{ display: "flex", gap: "8px", marginTop: "12px" }}
-                  >
-                    {canEdit && (
-                      <button
-                        onClick={() => handleEditClick(report)}
-                        style={{
-                          flex: "0 0 48px",
-                          height: "48px",
-                          borderRadius: "12px",
-                          border: "1px solid var(--border)",
-                          background: "rgba(255,255,255,0.05)",
-                          color: "var(--text-main)",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                    )}
-                    {report.status === "pending" && isGov && (
-                      <button
-                        onClick={() => updateStatus(report._id, "rescued")}
-                        style={{
-                          flex: 1,
-                          background: "#22c55e",
-                          color: "#fff",
-                          borderRadius: "12px",
-                          fontWeight: 900,
-                        }}
-                      >
-                        🚑 Rescue
-                      </button>
-                    )}
-                    {report.status === "rescued" && isNGO && (
-                      <button
-                        onClick={() => updateStatus(report._id, "sheltered")}
-                        style={{
-                          flex: 1,
-                          background: "#8b5cf6",
-                          color: "#fff",
-                          borderRadius: "12px",
-                          fontWeight: 900,
-                        }}
-                      >
-                        🏠 Shelter
-                      </button>
-                    )}
+                    <Info size={18} opacity={0.4} />
                   </div>
                 </div>
+                <p
+                  style={{
+                    fontSize: "1.1rem",
+                    opacity: 0.6,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <MapPin size={20} color="#f59e0b" /> {report.location}
+                </p>
+
+                {report.aiAdvice && (
+                  <div
+                    style={{
+                      background: "rgba(34,197,94,0.08)",
+                      border: "1px solid #22c55e30",
+                      borderRadius: "20px",
+                      padding: "1.5rem",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#16a34a",
+                        fontWeight: 900,
+                        margin: "0 0 10px",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      🤖 AI Vet Intelligence
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "1rem",
+                        margin: 0,
+                        lineHeight: 1.6,
+                        opacity: 0.9,
+                      }}
+                    >
+                      {report.aiAdvice}
+                    </p>
+                  </div>
+                )}
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* ✅ FLOATING ACTION BUTTON - PERFECTLY CENTERED ICON */}
       <button
         onClick={() => setShowModal(true)}
         style={{
           position: "fixed",
-          bottom: "40px",
-          right: "40px",
-          background: "#f59e0b",
+          bottom: "50px",
+          right: "50px",
+          background: "linear-gradient(135deg, #f59e0b, #d97706)",
           color: "white",
-          width: "75px",
-          height: "75px",
+          width: "90px",
+          height: "90px",
           borderRadius: "50%",
           zIndex: 1000,
-          boxShadow: "0 10px 25px rgba(245,158,11,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           border: "none",
           cursor: "pointer",
+          boxShadow: "0 20px 40px rgba(245,158,11,0.5)",
+          transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
         }}
       >
-        <Plus size={45} strokeWidth={3} />
+        <Plus size={55} strokeWidth={3} />
       </button>
 
-      {/* MODAL - REPORT FORM */}
+      {/* EMERGENCY MODAL - HEAVY UI */}
       {showModal && (
         <div
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.9)",
+            background: "rgba(0,0,0,0.95)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             zIndex: 5000,
-            backdropFilter: "blur(15px)",
+            backdropFilter: "blur(25px)",
             padding: "20px",
           }}
         >
           <div
             style={{
               background: "var(--bg-card)",
-              borderRadius: "32px",
-              padding: "40px",
+              borderRadius: "45px",
+              padding: "50px",
               width: "100%",
-              maxWidth: "550px",
-              maxHeight: "95vh",
+              maxWidth: "650px",
+              maxHeight: "92vh",
               overflowY: "auto",
               border: "1px solid var(--border)",
+              boxShadow: "0 40px 120px rgba(0,0,0,0.6)",
             }}
           >
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                marginBottom: "25px",
+                marginBottom: "40px",
               }}
             >
-              <h2 style={{ fontSize: "2rem", fontWeight: 800, margin: 0 }}>
-                {editingReport ? "✏️ Edit Report" : "🚨 New Emergency"}
+              <h2
+                style={{
+                  fontSize: "2.8rem",
+                  fontWeight: 900,
+                  margin: 0,
+                  letterSpacing: "-2px",
+                }}
+              >
+                🚨 Broadcast Alert
               </h2>
               <X
-                onClick={closeModal}
-                style={{ cursor: "pointer", opacity: 0.6 }}
+                onClick={() => setShowModal(false)}
+                style={{ cursor: "pointer", opacity: 0.3 }}
+                size={35}
               />
             </div>
 
             <div
               onClick={() => fileInputRef.current.click()}
               style={{
-                height: "200px",
-                border: "2px dashed var(--border)",
-                borderRadius: "20px",
+                height: "260px",
+                border: "4px dashed var(--border)",
+                borderRadius: "35px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 cursor: "pointer",
-                background: "rgba(255,255,255,0.03)",
-                marginBottom: "20px",
+                background: "rgba(255,255,255,0.02)",
+                marginBottom: "35px",
                 overflow: "hidden",
               }}
             >
@@ -716,16 +712,28 @@ const Dashboard = () => {
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               ) : (
-                <div style={{ textAlign: "center", opacity: 0.5 }}>
-                  <Camera size={40} />
-                  <p>Take Animal Photo 📸</p>
+                <div style={{ textAlign: "center", opacity: 0.3 }}>
+                  <Camera size={70} />
+                  <p
+                    style={{
+                      fontWeight: 800,
+                      marginTop: "20px",
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    TAP TO SCAN ANIMAL 📸
+                  </p>
                 </div>
               )}
             </div>
+
+            {/* INSTANT CAMERA FOR MOBILE */}
             <input
               type="file"
               ref={fileInputRef}
               hidden
+              accept="image/*"
+              capture="environment"
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -735,15 +743,14 @@ const Dashboard = () => {
                   reader.onloadend = () => setPhotoBase64(reader.result);
                 }
               }}
-              accept="image/*"
             />
 
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                gap: "12px",
-                marginBottom: "20px",
+                gap: "20px",
+                marginBottom: "30px",
               }}
             >
               <button
@@ -751,17 +758,14 @@ const Dashboard = () => {
                 style={{
                   background: "#3b82f6",
                   color: "white",
-                  padding: "12px",
-                  borderRadius: "50px",
+                  padding: "20px",
+                  borderRadius: "100px",
                   border: "none",
-                  fontWeight: "bold",
+                  fontWeight: "900",
+                  fontSize: "1.1rem",
                 }}
               >
-                {isLocationLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  "📍 GPS Lock"
-                )}
+                📍 GPS Lock
               </button>
               <button
                 onClick={handleAiAnalysis}
@@ -769,296 +773,149 @@ const Dashboard = () => {
                 style={{
                   background: "#10b981",
                   color: "white",
-                  padding: "12px",
-                  borderRadius: "50px",
+                  padding: "20px",
+                  borderRadius: "100px",
                   border: "none",
-                  fontWeight: "bold",
+                  fontWeight: "900",
+                  fontSize: "1.1rem",
                 }}
               >
-                {isAiLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  "✨ AI Scan"
-                )}
+                {isAiLoading ? "Processing..." : "✨ AI Scan"}
               </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              <input
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                style={{
-                  width: "100%",
-                  padding: "1rem",
-                  borderRadius: "15px",
-                  marginBottom: "12px",
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  border: "1px solid var(--border)",
-                }}
-                placeholder="📍 Landmark / Location"
-              />
+            {/* AI DIAGNOSIS BOX - RESTORED FULL STYLE */}
+            {aiAdvice && (
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                  marginBottom: "12px",
+                  background: "rgba(34,197,94,0.15)",
+                  border: "2.5px solid #22c55e",
+                  borderRadius: "30px",
+                  padding: "25px",
+                  marginBottom: "30px",
+                  animation: "slideUp 0.5s ease",
                 }}
               >
-                <select
-                  value={form.animalType}
-                  onChange={(e) =>
-                    setForm({ ...form, animalType: e.target.value })
-                  }
-                  style={selectStyle}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    marginBottom: "12px",
+                  }}
                 >
-                  {Object.keys(SPECIES_EMOJIS).map((s) => (
-                    <option key={s} value={s}>
-                      {SPECIES_EMOJIS[s]} {s.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={form.urgency}
-                  onChange={(e) =>
-                    setForm({ ...form, urgency: e.target.value })
-                  }
-                  style={selectStyle}
+                  <ShieldCheck color="#22c55e" size={28} />
+                  <p
+                    style={{
+                      color: "#22c55e",
+                      fontWeight: 900,
+                      margin: 0,
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    AI VET DETECTED: {aiDetectedSpecies}
+                  </p>
+                </div>
+                <p
+                  style={{
+                    fontSize: "1.1rem",
+                    margin: "0 0 20px",
+                    lineHeight: 1.6,
+                    fontWeight: 500,
+                  }}
                 >
-                  <option value="low">🟢 Low</option>
-                  <option value="medium">🟡 Medium</option>
-                  <option value="high">🔴 High</option>
-                </select>
+                  {aiAdvice}
+                </p>
+                <div
+                  style={{
+                    background: "rgba(59,130,246,0.2)",
+                    padding: "20px",
+                    borderRadius: "20px",
+                    border: "1px solid #3b82f6",
+                  }}
+                >
+                  <p
+                    style={{
+                      color: "#3b82f6",
+                      fontWeight: 900,
+                      margin: "0 0 8px",
+                      fontSize: "0.85rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    💊 Emergency Medication / First Aid
+                  </p>
+                  <p
+                    style={{ fontSize: "1.05rem", margin: 0, fontWeight: 600 }}
+                  >
+                    {aiMeds}
+                  </p>
+                </div>
               </div>
-              <textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                style={{
-                  width: "100%",
-                  padding: "1rem",
-                  borderRadius: "15px",
-                  marginBottom: "20px",
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  border: "1px solid var(--border)",
-                  minHeight: "80px",
-                }}
-                placeholder="Condition details..."
-              />
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: "20px" }}>
+                <input
+                  value={form.location}
+                  onChange={(e) =>
+                    setForm({ ...form, location: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "1.5rem",
+                    borderRadius: "22px",
+                    background: "rgba(255,255,255,0.04)",
+                    color: "white",
+                    border: "1px solid var(--border)",
+                    fontSize: "1.1rem",
+                  }}
+                  placeholder="📍 Exact Location / Landmark"
+                />
+              </div>
+              <div style={{ marginBottom: "35px" }}>
+                <textarea
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "1.5rem",
+                    borderRadius: "22px",
+                    background: "rgba(255,255,255,0.04)",
+                    color: "white",
+                    border: "1px solid var(--border)",
+                    fontSize: "1.1rem",
+                    minHeight: "120px",
+                    resize: "none",
+                  }}
+                  placeholder="Extra details (e.g., Heavy bleeding, can't walk...)"
+                />
+              </div>
               <button
                 type="submit"
                 style={{
                   width: "100%",
                   background: "#f59e0b",
                   color: "white",
-                  padding: "1rem",
-                  borderRadius: "50px",
+                  padding: "1.6rem",
+                  borderRadius: "100px",
                   border: "none",
-                  fontWeight: "black",
+                  fontWeight: "900",
+                  fontSize: "1.3rem",
+                  cursor: "pointer",
+                  boxShadow: "0 15px 40px rgba(245,158,11,0.4)",
                 }}
               >
-                {editingReport ? "Update Report ✅" : "Submit Alert 🐾"}
+                SEND HELP NOW 🐾
               </button>
             </form>
           </div>
         </div>
       )}
-
-      {/* ✅ CERTIFICATE UI - 1300 LINES OF STYLE RESTORED */}
-      <div
-        ref={certificateRef}
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          top: 0,
-          width: "1123px",
-          height: "794px",
-          background: "white",
-          overflow: "hidden",
-          fontFamily: "'Playfair Display', serif",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "220px",
-            height: "160px",
-            background: "linear-gradient(135deg, #FF9933 50%, transparent 50%)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            width: "220px",
-            height: "160px",
-            background: "linear-gradient(-45deg, #138808 50%, transparent 50%)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: "20px",
-            border: "10px double #D4AF37",
-            zIndex: 2,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: "20px",
-            padding: "50px 60px 40px",
-            zIndex: 3,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: "10px",
-            }}
-          >
-            <div style={{ textAlign: "center" }}>
-              <QRCodeSVG
-                value={`https://pawalert.in/verify/${user?._id}`}
-                size={110}
-                level="H"
-                includeMargin={true}
-              />
-              <p
-                style={{
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  color: "#000080",
-                  marginTop: "6px",
-                }}
-              >
-                SCAN TO VERIFY
-              </p>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <img
-                src="/ashok.png"
-                style={{ width: "65px", marginLeft: "auto", display: "block" }}
-                alt="Emblem"
-              />
-              <p style={{ fontSize: "16px", fontWeight: 900, margin: 0 }}>
-                Ministry of Culture
-              </p>
-              <p style={{ fontSize: "13px", margin: 0 }}>Government of India</p>
-            </div>
-          </div>
-          <div style={{ textAlign: "center", flex: 1 }}>
-            <h1
-              style={{
-                fontSize: "90px",
-                fontWeight: 900,
-                margin: "0",
-                color: "#1a1a1a",
-                lineHeight: 1,
-              }}
-            >
-              CERTIFICATE
-            </h1>
-            <h3
-              style={{
-                fontSize: "22px",
-                letterSpacing: "14px",
-                color: "#555",
-                margin: "8px 0 30px",
-              }}
-            >
-              OF APPRECIATION
-            </h3>
-            <p style={{ fontSize: "18px", color: "#888", fontStyle: "italic" }}>
-              PROUDLY PRESENTED TO
-            </p>
-            <h2
-              style={{
-                fontSize: "68px",
-                fontStyle: "italic",
-                color: "#D4762A",
-                borderBottom: "3px solid #eee",
-                display: "inline-block",
-                padding: "0 80px 8px",
-              }}
-            >
-              {user?.name}
-            </h2>
-            <p
-              style={{
-                fontSize: "17px",
-                lineHeight: 1.8,
-                maxWidth: "820px",
-                margin: "0 auto",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              For successfully rescuing <b>{rescuedCount} stray animals</b>{" "}
-              through <b>PawAlert</b>.<br />
-              An exemplary contribution to make India safer for every living
-              being.
-            </p>
-          </div>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <div style={{ textAlign: "center", width: "260px" }}>
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#1c1c1c",
-                  margin: "0 0 4px",
-                  textAlign: "left",
-                }}
-              >
-                Founder,
-              </p>
-              <img
-                src="/adarsh_sign-removebg-preview.png"
-                alt="Signature"
-                style={{
-                  width: "200px",
-                  height: "70px",
-                  objectFit: "contain",
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  height: "2px",
-                  background: "#1a1a1a",
-                  width: "100%",
-                  margin: "4px 0",
-                }}
-              />
-              <p
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 900,
-                  color: "#1c1c1c",
-                  margin: "0 0 2px",
-                }}
-              >
-                Adarsh Thakur
-              </p>
-              <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>
-                Authorized Signatory, PawAlert Network
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
