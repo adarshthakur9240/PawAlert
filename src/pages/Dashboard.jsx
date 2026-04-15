@@ -60,7 +60,6 @@ const Dashboard = () => {
   const fileInputRef = useRef(null);
   const certificateRef = useRef(null);
 
-  // Hybrid Identity
   const user =
     reduxUser ||
     (clerkUser
@@ -128,12 +127,11 @@ const Dashboard = () => {
             clerkId: clerkUser.id,
             userType: clerkUser.unsafeMetadata?.userType || "citizen",
           });
-          if (data.success) {
+          if (data.success)
             dispatch({
               type: "auth/loginSuccess",
               payload: { user: data.user, token: data.token },
             });
-          }
         } catch (err) {
           console.error("Sync Error");
         }
@@ -202,22 +200,25 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!photoBase64) return toast.error("Photo is required!");
-    const loadingToast = toast.loading("Broadcasting Emergency...");
     try {
-      const payload = { ...form, photo: photoBase64, aiAdvice, aiMeds };
-      await api.post("/api/reports", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Emergency Alert Sent! 🐾", { id: loadingToast });
+      await api.post(
+        "/api/reports",
+        { ...form, photo: photoBase64, aiAdvice, aiMeds },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
       setShowModal(false);
       loadReports();
+      toast.success("Emergency Alert Sent! 🐾");
     } catch (err) {
-      toast.error("Submission failed!", { id: loadingToast });
+      toast.error("Failed to submit!");
     }
   };
 
+  // ✅ FIXED CERTIFICATE DOWNLOAD LOGIC
   const downloadCertificate = async () => {
-    if (rescuedCount < 1) return toast.error("Rescue at least 1 animal first!");
+    const loadingToast = toast.loading(
+      "Generating your Official Recognition...",
+    );
     setIsDownloading(true);
     try {
       const el = certificateRef.current;
@@ -225,21 +226,29 @@ const Dashboard = () => {
       el.style.position = "fixed";
       el.style.top = "0px";
       el.style.zIndex = "99999";
+
+      // Wait for QR and Styles to render
       await new Promise((r) => setTimeout(r, 1000));
+
       const canvas = await html2canvas(el, {
         scale: 3,
         useCORS: true,
         backgroundColor: "#ffffff",
+        logging: false,
       });
+
       el.style.left = "-9999px";
       el.style.position = "absolute";
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("l", "mm", "a4");
       pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
-      pdf.save(`Official_Certificate_${user?.name}.pdf`);
-      toast.success("Certificate Secured! 🇮🇳");
+      pdf.save(`Official_Certificate_${user?.name?.replace(/\s+/g, "_")}.pdf`);
+
+      toast.success("Certificate Secured! 🇮🇳", { id: loadingToast });
     } catch (err) {
-      toast.error("Download failed!");
+      console.error(err);
+      toast.error("Download failed! Check console.", { id: loadingToast });
     } finally {
       setIsDownloading(false);
     }
@@ -314,7 +323,6 @@ const Dashboard = () => {
               padding: "10px 25px",
               borderRadius: "100px",
               border: "1px solid #222",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
             }}
           >
             <div
@@ -438,9 +446,7 @@ const Dashboard = () => {
               <div style={{ color: s.color, marginBottom: "12px" }}>
                 {s.icon}
               </div>
-              <div
-                style={{ fontSize: "2.5rem", fontWeight: 900, color: s.color }}
-              >
+              <div style={{ fontSize: "2.5rem", fontWeight: 900, color: s.c }}>
                 {s.value}
               </div>
               <div
@@ -473,6 +479,7 @@ const Dashboard = () => {
                 borderRadius: "32px",
                 overflow: "hidden",
                 border: "1px solid #222",
+                position: "relative",
               }}
             >
               <div
@@ -525,7 +532,6 @@ const Dashboard = () => {
                         fontSize: "0.8rem",
                         color: "#16a34a",
                         fontWeight: 800,
-                        margin: "0 0 5px",
                       }}
                     >
                       🤖 AI VET ADVICE
@@ -541,7 +547,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Floating Plus Button */}
+      {/* FAB */}
       <button
         onClick={() => setShowModal(true)}
         style={{
@@ -564,7 +570,7 @@ const Dashboard = () => {
         <Plus size={45} strokeWidth={3} color="white" />
       </button>
 
-      {/* Emergency Modal */}
+      {/* Modal */}
       {showModal && (
         <div
           style={{
@@ -607,7 +613,6 @@ const Dashboard = () => {
                 size={30}
               />
             </div>
-
             <div
               onClick={() => fileInputRef.current.click()}
               style={{
@@ -632,7 +637,6 @@ const Dashboard = () => {
                 <Camera size={50} opacity={0.3} />
               )}
             </div>
-
             <input
               type="file"
               ref={fileInputRef}
@@ -649,7 +653,6 @@ const Dashboard = () => {
                 }
               }}
             />
-
             <div
               style={{
                 display: "grid",
@@ -686,7 +689,6 @@ const Dashboard = () => {
                 {isAiLoading ? "SCANNING..." : "✨ AI SCAN"}
               </button>
             </div>
-
             {aiAdvice && (
               <div
                 style={{
@@ -731,7 +733,6 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
-
             <form onSubmit={handleSubmit}>
               <input
                 value={form.location}
