@@ -1,40 +1,56 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useClerk } from '@clerk/clerk-react';
+import { LogOut, LayoutDashboard, LifeBuoy, Heart } from 'lucide-react';
+
 const Navbar = () => {
+  const { token } = useSelector((state) => state.auth);
+  const { signOut } = useClerk();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+
+  const handleLogout = async () => {
+    await signOut();
+    dispatch({ type: 'auth/logout' });
+    navigate('/');
   };
-  const getRoleLabel = (role) => {
-    if (!role) return 'USER';
-    const r = role.toLowerCase();
-    if (r === 'admin') return 'ADMIN';
-    if (r === 'goi') return 'GOI';
-    if (r === 'ngo') return 'NGO';
-    return 'USER';
-  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/50 backdrop-blur-xl border-b border-zinc-800/50 px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-2xl font-black text-white flex items-center gap-2">
-          <span className="text-orange-500">⚡</span> PawAlert
-        </Link>
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/dashboard" className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition">Dashboard</Link>
-          <Link to="/support" className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition">Support</Link>
-          {user ? (
-            <div className="flex items-center gap-4 border-l border-zinc-800 pl-8">
-              <span className="text-[10px] bg-orange-500/10 text-orange-500 px-2 py-1 rounded font-black uppercase">{getRoleLabel(user.role)}</span>
-              <button onClick={handleLogout} className="bg-orange-500 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition">Logout</button>
-            </div>
-          ) : (
-            <Link to="/login" className="bg-white text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition">Login</Link>
-          )}
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, height: '80px',
+      background: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)',
+      borderBottom: '1px solid #222', display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between', padding: '0 40px', zIndex: 10000
+    }}>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+        <div style={{ background: '#f59e0b', padding: '8px', borderRadius: '12px' }}>
+          <Heart size={24} color="white" fill="white" />
         </div>
+        <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>PawAlert</span>
+      </Link>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
+        <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Dashboard</Link>
+        <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Support</Link>
+
+        {token ? (
+          <button onClick={handleLogout} style={{
+            background: '#ef4444', color: 'white', border: 'none',
+            padding: '8px 18px', borderRadius: '50px', fontWeight: 800,
+            cursor: 'pointer', fontSize: '0.85rem'
+          }}>
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" style={{
+            background: 'white', color: 'black', padding: '8px 20px',
+            borderRadius: '50px', textDecoration: 'none', fontWeight: 800, fontSize: '0.85rem'
+          }}>Login</Link>
+        )}
       </div>
     </nav>
   );
 };
+
 export default Navbar;
