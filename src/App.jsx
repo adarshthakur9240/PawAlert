@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import LoadingBar from "react-top-loading-bar";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
@@ -33,24 +34,38 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050505] text-white">
-      <LoadingBar
-        color="#f97316"
-        progress={progress}
-        onLoaderFinished={() => setProgress(0)}
-        height={3}
-        shadow={true}
-        containerStyle={{ zIndex: 1000000, position: "fixed", top: 0 }}
-      />
+      <LoadingBar color="#f97316" progress={progress} onLoaderFinished={() => setProgress(0)} height={3} />
+      
       {showNavbar && <Navbar />}
+      
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* Public Routes - Sirf tab dikhenge jab logged out ho */}
+          <Route path="/login" element={
+            <SignedOut><Login /></SignedOut>
+          } />
+          <Route path="/register" element={
+            <SignedOut><Register /></SignedOut>
+          } />
+
+          {/* Protected Route - Sirf tab dikhega jab logged in ho */}
+          <Route path="/dashboard" element={
+            <>
+              <SignedIn>
+                <Dashboard />
+              </SignedIn>
+              <SignedOut>
+                <Navigate to="/login" />
+              </SignedOut>
+            </>
+          } />
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+      
       <AppDownload />
       {showFooter && <Footer />}
     </div>
