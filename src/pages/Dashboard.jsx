@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../configs/api.js";

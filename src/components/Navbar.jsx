@@ -1,34 +1,46 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { useClerk } from '@clerk/clerk-react';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Navbar = () => {
-  const { token } = useSelector((state) => state.auth);
-  const { signOut } = useClerk();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
     dispatch({ type: 'auth/logout' });
-    navigate('/');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
+  const getRoleLabel = (role) => {
+    if (!role) return 'USER';
+    const r = role.toLowerCase();
+    if (r === 'admin') return 'ADMIN';
+    if (r === 'goi' || r === 'government' || r === 'gov') return 'GOI';
+    if (r === 'ngo') return 'NGO';
+    return 'USER';
   };
 
   return (
-    <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '90px', background: 'rgba(8, 8, 8, 0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 60px', zIndex: 10000 }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '15px', textDecoration: 'none' }}>
-        <img src="/logo.png" alt="Logo" style={{ height: '50px' }} />
-        <span style={{ fontSize: '1.8rem', fontWeight: 900, color: '#fff', letterSpacing: '-1.5px' }}>PawAlert</span>
-      </Link>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-        <Link to="/dashboard" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }}>Dashboard</Link>
-        <Link to="/support" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }}>Support</Link>
-        {token ? (
-          <button onClick={handleLogout} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '12px 25px', borderRadius: '50px', fontWeight: 800, cursor: 'pointer' }}>Logout</button>
-        ) : (
-          <Link to="/login" style={{ background: '#fff', color: '#000', padding: '12px 30px', borderRadius: '50px', textDecoration: 'none', fontWeight: 800 }}>Login</Link>
-        )}
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/50 backdrop-blur-xl border-b border-zinc-800/50 px-6 py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <Link to="/" className="text-2xl font-black text-white flex items-center gap-2">
+          <span className="text-orange-500">⚡</span> PawAlert
+        </Link>
+        <div className="hidden md:flex items-center gap-8">
+          <Link to="/dashboard" className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition">Dashboard</Link>
+          <Link to="/support" className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition">Support</Link>
+          {user ? (
+            <div className="flex items-center gap-4 border-l border-zinc-800 pl-8">
+              <span className="text-[10px] bg-orange-500/10 text-orange-500 px-2 py-1 rounded font-black uppercase">{getRoleLabel(user.role)}</span>
+              <button onClick={handleLogout} className="bg-orange-500 text-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition">Logout</button>
+            </div>
+          ) : (
+            <Link to="/login" className="bg-white text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition">Login</Link>
+          )}
+        </div>
       </div>
     </nav>
   );
