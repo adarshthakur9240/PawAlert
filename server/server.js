@@ -15,14 +15,21 @@ dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 
+// ✅ FIX: Sabhi possible Vercel domains ko allow karo
 app.use(cors({
-  origin: [
-    "https://paw-alert-ten.vercel.app",
-    "https://paw-alert-7xz35sef2-adarshthakur9240s-projects.vercel.app",
-    "https://paw-alert-git-main-adarshthakur9240s-projects.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:5174",
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "https://paw-alert-ten.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:5174"
+    ];
+    // Allow any Vercel preview branch URL
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
