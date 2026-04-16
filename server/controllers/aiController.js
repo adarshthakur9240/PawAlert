@@ -4,41 +4,50 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-// Helper function to get model with safety settings
+// 🛠️ Stable Model Configuration
+const MODEL_NAME = "gemini-1.5-flash";
+
 const getPawAlertModel = (genAI) => {
-  return genAI.getGenerativeModel({
-    model: "models/gemini-1.5-flash", // Stable model name
-    safetySettings: [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_NONE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_NONE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_NONE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_NONE,
-      },
-    ],
-  });
+  return genAI.getGenerativeModel(
+    {
+      model: MODEL_NAME,
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ],
+    },
+    { apiVersion: "v1" },
+  ); // 🔥 CRITICAL: Beta ki jagah Stable v1 force kiya
 };
 
-// 1. IMAGE ANALYZE WALA FUNCTION
+// 1. IMAGE ANALYZE FUNCTION
 export const analyzeImage = async (req, res) => {
   try {
     const { image, description } = req.body;
     if (!image) return res.status(400).json({ message: "No image provided" });
 
+    // API Key check
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is missing in environment variables");
+    }
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = getPawAlertModel(genAI);
 
-    // Extract Base64 data correctly
     const base64Data = image.split(",")[1] || image;
 
     const prompt = `
@@ -60,24 +69,25 @@ export const analyzeImage = async (req, res) => {
       { inlineData: { data: base64Data, mimeType: "image/jpeg" } },
     ]);
 
-    const text = result.response.text();
-    // Remove markdown code blocks if AI includes them
+    const response = await result.response;
+    const text = response.text();
     const cleanJson = text.replace(/```json|```/g, "").trim();
     const data = JSON.parse(cleanJson);
 
     res.json(data);
   } catch (error) {
-    console.error("Gemini Image Error Details:", error);
+    console.error("🚨 Gemini Image Error Details:", error.message);
     res.status(500).json({
       species: "Animal",
       urgency: "High",
       medicationAdvice: "AI analysis failed. Immediate Vet visit recommended.",
       firstAid: "Clean wound with antiseptic and keep animal warm.",
+      error: error.message, // Debugging ke liye
     });
   }
 };
 
-// 2. TEXT ANALYZE WALA FUNCTION
+// 2. TEXT ANALYZE FUNCTION
 export const analyzeDescription = async (req, res) => {
   try {
     const { description } = req.body;
@@ -102,13 +112,14 @@ export const analyzeDescription = async (req, res) => {
     `;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    const response = await result.response;
+    const text = response.text();
     const cleanJson = text.replace(/```json|```/g, "").trim();
     const data = JSON.parse(cleanJson);
 
     res.json(data);
   } catch (error) {
-    console.error("Gemini Text Error Details:", error);
+    console.error("🚨 Gemini Text Error Details:", error.message);
     res.status(500).json({
       species: "Unknown",
       urgency: "High",
