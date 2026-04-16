@@ -7,14 +7,16 @@ import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/clerk-react";
 import "./index.css";
+
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignInUrl="/dashboard" afterSignUpUrl="/dashboard">
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
     <Provider store={store}>
       <BrowserRouter>
         <App />
         <Toaster position="top-right" />
       </BrowserRouter>
     </Provider>
-  </ClerkProvider>
+  </ClerkProvider>,
 );

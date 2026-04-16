@@ -49,29 +49,53 @@ const App = () => {
       "/register": "PawAlert | Join the Mission",
       "/support": "PawAlert | Support",
     };
-    document.title = pageTitles[location.pathname] || "PawAlert";
+    // Agar URL /login/verify-email ho jaye toh title tutega nahi
+    const currentTitle = Object.keys(pageTitles).find(
+      (key) => location.pathname.startsWith(key) && key !== "/",
+    );
+    document.title = currentTitle ? pageTitles[currentTitle] : pageTitles["/"];
+
     setProgress(30);
     const t = setTimeout(() => setProgress(100), 200);
     return () => clearTimeout(t);
   }, [location.pathname]);
 
+  // Fix: StartsWith taaki /register/verify-email par footer na dikhe
   const hideFooterRoutes = ["/login", "/register", "/dashboard"];
-  const showFooter = !hideFooterRoutes.includes(location.pathname);
-
-  if (!isLoaded) return (
-    <div style={{ minHeight: "100vh", background: "#080808", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "#f59e0b", fontSize: "2rem" }}>🐾</div>
-    </div>
+  const showFooter = !hideFooterRoutes.some((route) =>
+    location.pathname.startsWith(route),
   );
+
+  if (!isLoaded)
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#080808",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ color: "#f59e0b", fontSize: "2rem" }}>🐾</div>
+      </div>
+    );
 
   return (
     <div style={{ minHeight: "100vh", background: "#080808", color: "#fff" }}>
-      <LoadingBar color="#f97316" progress={progress} onLoaderFinished={() => setProgress(0)} height={3} containerStyle={{ zIndex: 1000000, position: "fixed", top: 0 }} />
+      <LoadingBar
+        color="#f97316"
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+        height={3}
+        containerStyle={{ zIndex: 1000000, position: "fixed", top: 0 }}
+      />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Fix: Added wildcards /* for Clerk OTP routes */}
+          <Route path="/login/*" element={<Login />} />
+          <Route path="/register/*" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/support" element={<Support />} />
           <Route path="/privacy" element={<Home />} />
