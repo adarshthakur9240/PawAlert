@@ -41,7 +41,10 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: "10mb" }));
+// 👇 YAHAN HAI WO NAYA FIX (10MB hata kar 50MB kar diya dono ke liye) 👇
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+// 👆 ============================================================= 👆
 
 mongoose
   .connect(process.env.MONGODB_URI)
