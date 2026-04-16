@@ -2,9 +2,9 @@ import express from "express";
 import {
   createReport,
   getReports,
-  upvoteReport,
-  // updateStatus, // ❌ Isko bhi comment kar diya
-  // updateReport  // ❌ Ye pehle se commented hai
+  // upvoteReport, // ❌ Not yet in controller
+  // updateStatus, // ❌ Not yet in controller
+  // updateReport  // ❌ Not yet in controller
 } from "../controllers/reportController.js";
 import auth from "../middleware/auth.js";
 
@@ -15,8 +15,10 @@ router.get("/", getReports);
 
 // Protected routes (Login zaroori hai)
 router.post("/", auth, createReport);
-// router.put("/:id", auth, updateReport); // ❌ Commented
-router.put("/:id/upvote", upvoteReport);
-// router.put("/:id/status", auth, updateStatus); // ❌ Route bhi comment kar diya
+
+// ❌ Niche ke saare routes comment kar diye jab tak inka code backend me na likh jaye:
+// router.put("/:id", auth, updateReport);
+// router.put("/:id/upvote", upvoteReport);
+// router.put("/:id/status", auth, updateStatus);
 
 export default router;
