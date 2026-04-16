@@ -7,7 +7,7 @@ import {
 // Helper function to get model with safety settings
 const getPawAlertModel = (genAI) => {
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash", // Stable model name
+    model: "gemini-2.0-flash", // Stable model name
     safetySettings: [
       {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
