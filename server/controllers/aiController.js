@@ -1,14 +1,44 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} from "@google/generative-ai";
 
-// 1. IMAGE ANALYZE WALA FUNCTION (Tera original code)
+// Helper function to get model with safety settings
+const getPawAlertModel = (genAI) => {
+  return genAI.getGenerativeModel({
+    model: "gemini-1.5-flash", // Stable model name
+    safetySettings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+    ],
+  });
+};
+
+// 1. IMAGE ANALYZE WALA FUNCTION
 export const analyzeImage = async (req, res) => {
   try {
     const { image, description } = req.body;
     if (!image) return res.status(400).json({ message: "No image provided" });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = getPawAlertModel(genAI);
 
+    // Extract Base64 data correctly
     const base64Data = image.split(",")[1] || image;
 
     const prompt = `
@@ -31,13 +61,13 @@ export const analyzeImage = async (req, res) => {
     ]);
 
     const text = result.response.text();
-    // Clean text from any markdown tags
+    // Remove markdown code blocks if AI includes them
     const cleanJson = text.replace(/```json|```/g, "").trim();
     const data = JSON.parse(cleanJson);
 
     res.json(data);
   } catch (error) {
-    console.error("Gemini Image Error:", error);
+    console.error("Gemini Image Error Details:", error);
     res.status(500).json({
       species: "Animal",
       urgency: "High",
@@ -47,7 +77,7 @@ export const analyzeImage = async (req, res) => {
   }
 };
 
-// 2. TEXT ANALYZE WALA FUNCTION (Ye missing tha!)
+// 2. TEXT ANALYZE WALA FUNCTION
 export const analyzeDescription = async (req, res) => {
   try {
     const { description } = req.body;
@@ -55,7 +85,7 @@ export const analyzeDescription = async (req, res) => {
       return res.status(400).json({ message: "No description provided" });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = getPawAlertModel(genAI);
 
     const prompt = `
       Instructions: You are a professional Vet. Analyze the following injury description for a stray animal.
@@ -73,13 +103,12 @@ export const analyzeDescription = async (req, res) => {
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    // Clean text from any markdown tags
     const cleanJson = text.replace(/```json|```/g, "").trim();
     const data = JSON.parse(cleanJson);
 
     res.json(data);
   } catch (error) {
-    console.error("Gemini Text Error:", error);
+    console.error("Gemini Text Error Details:", error);
     res.status(500).json({
       species: "Unknown",
       urgency: "High",
