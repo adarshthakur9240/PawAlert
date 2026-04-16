@@ -15,32 +15,41 @@ dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 
-// ✅ FIX: Sabhi possible Vercel domains ko allow karo
-app.use(cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      "https://paw-alert-ten.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:5174"
-    ];
-    // Allow any Vercel preview branch URL
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
+// ✅ FIX: Sabhi possible domains ko allow karo (Custom + Vercel + Local)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "https://pawalert.in",
+        "https://www.pawalert.in",
+        "https://paw-alert-ten.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:5174",
+      ];
+      // Allow any defined URL or Vercel preview branch URL
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 app.use(express.json({ limit: "10mb" }));
 
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("Database connected ✅"))
   .catch((err) => console.log("DB Error:", err));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", clerkSyncRoutes); 
+app.use("/api/auth", clerkSyncRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/ai", aiRoutes);
 
