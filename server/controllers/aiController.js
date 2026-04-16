@@ -7,7 +7,7 @@ export const analyzeImage = async (req, res) => {
     if (!image) return res.status(400).json({ message: "No image provided" });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     const base64Data = image.split(",")[1] || image;
 
@@ -55,7 +55,7 @@ export const analyzeDescription = async (req, res) => {
       return res.status(400).json({ message: "No description provided" });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     const prompt = `
       Instructions: You are a professional Vet. Analyze the following injury description for a stray animal.
