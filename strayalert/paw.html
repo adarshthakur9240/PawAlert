@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawAlert — Stray Animal Rescue Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3ED;
+    --warm: #E8DDD0;
+    --amber: #D4762A;
+    --amber-light: #F09140;
+    --forest: #2A4A3A;
+    --forest-light: #3D6B57;
+    --sand: #C9B99A;
+    --charcoal: #1C1C1C;
+    --alert: #E05C3A;
+    --sky: #4A90C4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    overflow-x: hidden;
+    /* background-color: #1a1a1a; */
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 1000;
+    background: rgba(247,243,237,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--warm);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--forest);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--charcoal); font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--amber); }
+  .btn-report-nav {
+    background: var(--amber); color: white;
+    padding: 0.5rem 1.4rem; border-radius: 50px;
+    font-weight: 600; font-size: 0.9rem;
+    text-decoration: none; transition: all 0.2s;
+    border: 2px solid var(--amber);
+  }
+  .btn-report-nav:hover { background: transparent; color: var(--amber); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    background: var(--forest);
+    position: relative; overflow: hidden;
+    padding-top: 64px;
+  }
+  .hero-bg-pattern {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(212,118,42,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(74,144,196,0.1) 0%, transparent 40%),
+      radial-gradient(circle at 60% 80%, rgba(212,118,42,0.08) 0%, transparent 40%);
+  }
+  .hero-paw {
+    position: absolute; right: -60px; top: 50%; transform: translateY(-50%);
+    font-size: 28rem; opacity: 0.04; line-height: 1;
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(-50%) rotate(-5deg)} 50%{transform:translateY(-52%) rotate(5deg)} }
+
+  .hero-content {
+    max-width: 1200px; margin: 0 auto; padding: 4rem 2rem;
+    position: relative; z-index: 1;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(212,118,42,0.2); border: 1px solid rgba(212,118,42,0.4);
+    color: var(--amber-light); padding: 0.4rem 1rem; border-radius: 50px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 900; line-height: 1.05;
+    color: white;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 em { color: var(--amber-light); font-style: normal; }
+  .hero p {
+    color: rgba(255,255,255,0.7); font-size: 1.15rem;
+    max-width: 520px; line-height: 1.7; margin: 1.5rem 0 2.5rem;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+  .btn-primary {
+    background: var(--amber); color: white;
+    padding: 0.9rem 2rem; border-radius: 50px;
+    font-weight: 600; font-size: 1rem; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.25s; border: 2px solid var(--amber);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,118,42,0.4); }
+  .btn-secondary {
+    background: transparent; color: white;
+    padding: 0.9rem 2rem; border-radius: 50px;
+    font-weight: 600; font-size: 1rem; text-decoration: none;
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    animation: fadeUp 0.6s 0.4s ease both;
+    flex-wrap: wrap;
+  }
+  .stat { border-left: 2px solid var(--amber); padding-left: 1rem; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: white; font-weight: 700; }
+  .stat-label { color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  /* HOW IT WORKS */
+  .section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    display: inline-block; color: var(--amber); font-weight: 600;
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 900;
+    line-height: 1.1; margin-bottom: 1rem;
+  }
+  .section-sub { color: #666; font-size: 1.05rem; line-height: 1.7; max-width: 560px; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem; margin-top: 4rem;
+  }
+  .step {
+    background: white; border-radius: 20px; padding: 2rem;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--warm);
+  }
+  .step:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem; font-weight: 900;
+    color: var(--warm); line-height: 1;
+    position: absolute; right: 1rem; top: 0.5rem;
+  }
+  .step-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+  .step h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .step p { color: #777; font-size: 0.9rem; line-height: 1.6; }
+
+  /* MAP SECTION */
+  .map-section {
+    background: var(--forest);
+    padding: 5rem 2rem;
+  }
+  .map-container { max-width: 1200px; margin: 0 auto; }
+  .map-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; margin-bottom: 3rem; }
+  .map-header .section-title { color: white; }
+  .map-header .section-label { color: var(--amber-light); }
+  .map-header .section-sub { color: rgba(255,255,255,0.6); }
+
+  .map-wrapper {
+    background: #1a3328; border-radius: 24px; overflow: hidden;
+    position: relative; height: 480px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  #map-canvas {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1a2e26 0%, #1e3530 50%, #162a22 100%);
+    position: relative; overflow: hidden; cursor: crosshair;
+  }
+  .map-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .map-roads {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.07) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(255,255,255,0.07) 2px, transparent 2px);
+    background-size: 200px 200px;
+    background-position: 30px 50px;
+  }
+  .map-pin {
+    position: absolute; transform: translate(-50%, -100%);
+    cursor: pointer; animation: pinDrop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes pinDrop { from{opacity:0;transform:translate(-50%,-70%)} to{opacity:1;transform:translate(-50%,-100%)} }
+  .pin-body {
+    width: 36px; height: 36px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg); display: flex; align-items: center; justify-content: center;
+    position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+  }
+  .map-pin:hover .pin-body { transform: rotate(-45deg) scale(1.15); }
+  .pin-body::after {
+    content: ''; position: absolute;
+    width: 10px; height: 10px; background: rgba(255,255,255,0.3);
+    border-radius: 50%; top: 6px; left: 6px;
+  }
+  .pin-icon { transform: rotate(45deg); font-size: 1rem; }
+  .pin-label {
+    position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; background: rgba(0,0,0,0.8); color: white;
+    padding: 2px 8px; border-radius: 20px; font-size: 0.7rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .map-pin:hover .pin-label { opacity: 1; }
+  .pin-dog .pin-body { background: var(--alert); }
+  .pin-cat .pin-body { background: var(--sky); }
+  .pin-other .pin-body { background: var(--amber); }
+
+  .map-legend {
+    position: absolute; bottom: 1rem; left: 1rem;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    border-radius: 12px; padding: 0.8rem 1.2rem;
+    display: flex; gap: 1.2rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 0.75rem; font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .map-controls {
+    position: absolute; top: 1rem; right: 1rem;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .map-btn {
+    width: 36px; height: 36px; background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+    color: white; font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .map-btn:hover { background: rgba(255,255,255,0.2); }
+
+  .map-click-hint {
+    position: absolute; bottom: 1rem; right: 1rem;
+    background: rgba(212,118,42,0.9); color: white;
+    padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  /* REPORT MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px); z-index: 2000;
+    display: none; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white; border-radius: 24px; padding: 2.5rem;
+    width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(0.34,1.3,0.64,1) forwards;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 900; margin-bottom: 0.3rem;
+  }
+  .modal-sub { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+  .form-row { margin-bottom: 1.2rem; }
+  .form-label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem; color: #333; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1.5px solid var(--warm); border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    background: var(--cream); transition: border 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--amber); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .animal-types { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .type-btn {
+    padding: 0.45rem 1rem; border-radius: 50px;
+    border: 1.5px solid var(--warm); background: white;
+    font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+  }
+  .type-btn.active { background: var(--forest); color: white; border-color: var(--forest); }
+  .urgency-bar { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+  .urgency-btn {
+    flex: 1; padding: 0.55rem; border-radius: 10px;
+    border: 1.5px solid var(--warm); background: white;
+    font-weight: 600; font-size: 0.8rem; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+  }
+  .urgency-btn.low.active { background: #d4edda; border-color: #28a745; color: #155724; }
+  .urgency-btn.medium.active { background: #fff3cd; border-color: #ffc107; color: #856404; }
+  .urgency-btn.high.active { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+  .photo-upload {
+    border: 2px dashed var(--sand); border-radius: 16px;
+    padding: 2rem; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+  .photo-upload:hover { border-color: var(--amber); background: rgba(212,118,42,0.05); }
+  .photo-upload-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+  .photo-upload p { font-size: 0.85rem; color: #888; }
+  .photo-upload strong { color: var(--amber); }
+  .modal-actions { display: flex; gap: 1rem; }
+  .btn-submit {
+    flex: 1; background: var(--forest); color: white;
+    padding: 0.9rem; border-radius: 12px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-submit:hover { background: var(--forest-light); transform: translateY(-1px); }
+  .btn-cancel {
+    background: var(--warm); border: none; padding: 0.9rem 1.5rem;
+    border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cancel:hover { background: var(--sand); }
+
+  /* SUCCESS TOAST */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 3000;
+    background: var(--forest); color: white;
+    padding: 1rem 1.5rem; border-radius: 16px;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34,1.3,0.64,1);
+    max-width: 360px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 1.5rem; }
+  .toast-text strong { display: block; font-weight: 700; }
+  .toast-text span { font-size: 0.85rem; opacity: 0.8; }
+
+  /* DASHBOARD */
+  .dashboard-section { padding: 6rem 2rem; background: white; }
+  .dashboard-inner { max-width: 1200px; margin: 0 auto; }
+  .reports-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem; margin-top: 3rem;
+  }
+  .report-card {
+    border: 1px solid var(--warm); border-radius: 20px; overflow: hidden;
+    transition: all 0.3s; background: var(--cream);
+  }
+  .report-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.08); }
+  .report-card-img {
+    height: 180px; background: var(--warm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; position: relative;
+  }
+  .report-card-img .status-badge {
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .status-pending { background: #fff3cd; color: #856404; }
+  .status-government { background: #d4edda; color: #155724; }
+  .status-rescued { background: #cce5ff; color: #004085; }
+  .report-card-body { padding: 1.2rem; }
+  .report-card-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+  .report-card-loc { color: #888; font-size: 0.85rem; display: flex; align-items: center; gap: 4px; }
+  .report-card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+  .report-card-time { font-size: 0.78rem; color: #aaa; }
+  .upvote-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--warm); border: none; padding: 0.4rem 0.8rem;
+    border-radius: 50px; font-weight: 700; font-size: 0.8rem;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .upvote-btn:hover { background: var(--amber); color: white; }
+  .upvote-btn.voted { background: var(--amber); color: white; }
+
+  /* GOVERNMENT CONNECT */
+  .gov-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(135deg, var(--forest) 0%, #1a3a2a 100%);
+  }
+  .gov-inner { max-width: 1200px; margin: 0 auto; }
+  .gov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .gov-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 1rem; }
+  .gov-text { color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 2rem; }
+  .gov-features { display: flex; flex-direction: column; gap: 1rem; }
+  .gov-feature {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: rgba(255,255,255,0.05); border-radius: 16px; padding: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .gov-feature-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .gov-feature h4 { color: white; font-weight: 700; margin-bottom: 0.2rem; }
+  .gov-feature p { color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.5; }
+
+  .gov-form-card {
+    background: white; border-radius: 24px; padding: 2.5rem;
+  }
+  .gov-form-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; margin-bottom: 0.3rem; }
+  .gov-form-sub { color: #888; font-size: 0.85rem; margin-bottom: 1.8rem; }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background: var(--amber); padding: 3rem 2rem;
+  }
+  .stats-strip-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
+    text-align: center;
+  }
+  .strip-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 900; color: white;
+  }
+  .strip-stat-label { color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* FOOTER */
+  footer {
+    background: var(--charcoal); color: white; padding: 3rem 2rem;
+    text-align: center;
+  }
+  footer .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 0.8rem; }
+  footer .logo span { color: var(--amber); }
+  footer p { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+  footer .footer-links { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0; flex-wrap: wrap; }
+  footer .footer-links a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  footer .footer-links a:hover { color: var(--amber); }
+
+  /* NOTIFICATION COUNTER */
+  .counter-badge {
+    background: var(--alert); color: white;
+    width: 18px; height: 18px; border-radius: 50%;
+    font-size: 0.7rem; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    vertical-align: top; margin-left: 2px;
+  }
+
+  @media(max-width:768px) {
+    .nav-links { display: none; }
+    .gov-grid { grid-template-columns: 1fr; }
+    .stats-strip-inner { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .hero-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">🐾 Paw<span>Alert</span></div>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#map">Live Map</a></li>
+    <li><a href="#reports">Reports <span class="counter-badge" id="report-count">4</span></a></li>
+    <li><a href="#government">Gov Connect</a></li>
+  </ul>
+  <a href="#" class="btn-report-nav" onclick="openModal(); return false;">📍 Report Animal</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-paw">🐾</div>
+  <div class="hero-content">
+    <div class="hero-badge">🐶 Community Animal Rescue Network</div>
+    <h1>Report <em>Stray Animals,</em><br>Make Cities Safer</h1>
+    <p>Spot a stray? Pin it on the map. We connect your report directly to local government authorities for vaccination, rescue, and proper care.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary" onclick="openModal(); return false;">📍 Report a Stray Animal</a>
+      <a href="#map" class="btn-secondary">🗺️ View Live Map</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="hero-reports">1,247</div>
+        <div class="stat-label">Animals Reported</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">389</div>
+        <div class="stat-label">Rescued & Vaccinated</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">52</div>
+        <div class="stat-label">Cities Active</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section">
+    <div class="section-label">Simple Process</div>
+    <h2 class="section-title">Four Steps to<br>Make a Difference</h2>
+    <p class="section-sub">Anyone can help. Spot a stray, report it in seconds, and let the system handle the rest.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">👁️</div>
+        <h3>Spot a Stray</h3>
+        <p>See a stray dog, cat, or any animal on the street that needs help or vaccination.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">📍</div>
+        <h3>Pin the Location</h3>
+        <p>Open the app, tap the map, drop a pin exactly where the animal is. Add a photo and description.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🏛️</div>
+        <h3>Gov Gets Notified</h3>
+        <p>Your report is automatically forwarded to your local municipal corporation's animal welfare department.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon">💉</div>
+        <h3>Rescue & Vaccinate</h3>
+        <p>Government teams collect the animal, vaccinate, and either rehabilitate or rehome. You get status updates!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section id="map" class="map-section">
+  <div class="map-container">
+    <div class="map-header">
+      <div>
+        <div class="section-label">Live Sightings</div>
+        <h2 class="section-title">Community Map</h2>
+        <p class="section-sub">Real-time reports from your area. Click the map to report a new sighting.</p>
+      </div>
+    </div>
+    <div class="map-wrapper">
+      <div id="map-canvas">
+        <div class="map-grid"></div>
+        <div class="map-roads"></div>
+        <!-- Pins will be added via JS -->
+        <div class="map-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--alert)"></div>Dog</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div>Cat</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Other</div>
+        </div>
+        <div class="map-controls">
+          <button class="map-btn">+</button>
+          <button class="map-btn">−</button>
+          <button class="map-btn">⊙</button>
+        </div>
+        <div class="map-click-hint">📍 Click to report</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS FEED -->
+<section id="reports" class="dashboard-section">
+  <div class="dashboard-inner">
+    <div class="section-label">Community Feed</div>
+    <h2 class="section-title">Recent Reports</h2>
+    <p class="section-sub">Latest stray animal sightings reported by residents. Help upvote critical cases.</p>
+    <div class="reports-grid" id="reports-grid">
+      <!-- cards injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div>
+      <div class="strip-stat-num">96%</div>
+      <div class="strip-stat-label">Government Response Rate</div>
+    </div>
+    <div>
+      <div class="strip-stat-num">4.2h</div>
+      <div class="strip-stat-label">Average Response Time</div>
+    </div>
+    <div>
+      <div class="strip-stat-num">12K+</div>
+      <div class="strip-stat-label">Active Community Members</div>
+    </div>
+    <div>
+      <div class="strip-stat-num">389</div>
+      <div class="strip-stat-label">Animals Vaccinated</div>
+    </div>
+  </div>
+</div>
+
+<!-- GOV CONNECT -->
+<section id="government" class="gov-section">
+  <div class="gov-inner">
+    <div class="gov-grid">
+      <div>
+        <div class="section-label" style="color:var(--amber-light)">Government Portal</div>
+        <h2 class="gov-title">Direct Line to<br>Authorities</h2>
+        <p class="gov-text">PawAlert bridges citizens and government animal welfare departments. Every report triggers automated notifications to the right municipal bodies — ensuring no animal is left behind.</p>
+        <div class="gov-features">
+          <div class="gov-feature">
+            <div class="gov-feature-icon">🔔</div>
+            <div>
+              <h4>Auto-Notification System</h4>
+              <p>Reports are instantly forwarded to your city's municipal corporation, animal husbandry dept, and NGO partners.</p>
+            </div>
+          </div>
+          <div class="gov-feature">
+            <div class="gov-feature-icon">📊</div>
+            <div>
+              <h4>Real-Time Dashboard</h4>
+              <p>Government teams get a prioritized dashboard showing density maps, urgency levels, and pending pickups.</p>
+            </div>
+          </div>
+          <div class="gov-feature">
+            <div class="gov-feature-icon">💉</div>
+            <div>
+              <h4>Vaccination Tracking</h4>
+              <p>Each rescued animal is logged with a unique ID. Vaccination records are stored and publicly accessible.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gov-form-card">
+        <h3 class="gov-form-title">Register Your Municipality</h3>
+        <p class="gov-form-sub">Are you a government official? Connect your department to PawAlert's reporting network.</p>
+        <div class="form-row">
+          <label class="form-label">Municipal Body / Department Name</label>
+          <input type="text" class="form-input" placeholder="e.g., Greater Noida Municipal Corporation">
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">City / District</label>
+            <input type="text" class="form-input" placeholder="Noida">
+          </div>
+          <div class="form-row">
+            <label class="form-label">State</label>
+            <input type="text" class="form-input" placeholder="Uttar Pradesh">
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Official Email</label>
+          <input type="email" class="form-input" placeholder="dept@municipalcorp.gov.in">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Department Contact Number</label>
+          <input type="tel" class="form-input" placeholder="+91 98765 43210">
+        </div>
+        <button class="btn-submit" style="width:100%; margin-top:0.5rem" onclick="govSubmit()">
+          🏛️ Register & Connect
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">🐾 Paw<span>Alert</span></div>
+  <div class="footer-links">
+    <a href="#">About Us</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">For NGOs</a>
+    <a href="#">API for Governments</a>
+    <a href="#">Contact</a>
+  </div>
+  <p>© 2026 PawAlert India. Built with ❤️ for a cleaner, safer India. Making every street safe for humans and animals alike.</p>
+</footer>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 class="modal-title">🐾 Report a Stray</h2>
+    <p class="modal-sub">Help us locate and assist the animal. Your report goes directly to local authorities.</p>
+
+    <div class="form-row">
+      <label class="form-label">Animal Type</label>
+      <div class="animal-types">
+        <button class="type-btn active" onclick="selectType(this)">🐕 Dog</button>
+        <button class="type-btn" onclick="selectType(this)">🐈 Cat</button>
+        <button class="type-btn" onclick="selectType(this)">🐄 Cattle</button>
+        <button class="type-btn" onclick="selectType(this)">🦅 Bird</button>
+        <button class="type-btn" onclick="selectType(this)">🐾 Other</button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Urgency Level</label>
+      <div class="urgency-bar">
+        <button class="urgency-btn low active" onclick="selectUrgency(this, 'low')">🟢 Low — Healthy</button>
+        <button class="urgency-btn medium" onclick="selectUrgency(this, 'medium')">🟡 Medium — Needs Care</button>
+        <button class="urgency-btn high" onclick="selectUrgency(this, 'high')">🔴 High — Injured</button>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-row">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" placeholder="e.g., Priya Sharma">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Phone (optional)</label>
+        <input type="tel" class="form-input" placeholder="+91 98765 43210">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Location Address</label>
+      <input type="text" class="form-input" placeholder="e.g., Sector 62, Noida, near Metro Station" id="location-input">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" placeholder="Describe the animal's condition, color, size, behavior..."></textarea>
+    </div>
+
+    <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
+      <div class="photo-upload-icon">📷</div>
+      <p><strong>Upload a Photo</strong></p>
+      <p>Click to browse or drag & drop</p>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitReport()">📤 Submit Report to Govt</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon">✅</div>
+  <div class="toast-text">
+    <strong>Report Submitted!</strong>
+    <span>Authorities have been notified. You'll get an update via SMS.</span>
+  </div>
+</div>
+
+<script>
+  // SAMPLE REPORTS DATA
+  const sampleReports = [
+    { id: 1, icon: '🐕', type: 'dog', title: 'Injured Dog', location: 'Sector 62, Noida', time: '15 min ago', status: 'government', votes: 12, statusLabel: 'Gov Notified', color: '#E8DDD0' },
+    { id: 2, icon: '🐈', type: 'cat', title: 'Stray Kittens (3)', location: 'DLF Cyber City, Gurgaon', time: '1 hr ago', status: 'pending', votes: 8, statusLabel: 'Pending', color: '#E8F4E8' },
+    { id: 3, icon: '🐕', type: 'dog', title: 'Dog Pack (5-6)', location: 'Rohini, Delhi', time: '2 hrs ago', status: 'rescued', votes: 24, statusLabel: 'Rescued ✓', color: '#E8EDF4' },
+    { id: 4, icon: '🐄', type: 'other', title: 'Stray Cattle on Highway', location: 'NH-24, Ghaziabad', time: '3 hrs ago', status: 'pending', votes: 31, statusLabel: 'Pending', color: '#F4EDE8' },
+  ];
+
+  function renderReports() {
+    const grid = document.getElementById('reports-grid');
+    grid.innerHTML = sampleReports.map(r => `
+      <div class="report-card">
+        <div class="report-card-img" style="background:${r.color}">
+          ${r.icon}
+          <span class="status-badge status-${r.status}">${r.statusLabel}</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-card-title">${r.title}</div>
+          <div class="report-card-loc">📍 ${r.location}</div>
+          <div class="report-card-meta">
+            <span class="report-card-time">⏰ ${r.time}</span>
+            <button class="upvote-btn" onclick="upvote(this, ${r.id})">👍 ${r.votes}</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function upvote(btn, id) {
+    const report = sampleReports.find(r => r.id === id);
+    if (!btn.classList.contains('voted')) {
+      btn.classList.add('voted');
+      report.votes++;
+      btn.textContent = '👍 ' + report.votes;
+    }
+  }
+
+  // MAP PINS
+  const defaultPins = [
+    { x: 20, y: 30, type: 'dog', label: 'Stray Dog' },
+    { x: 55, y: 45, type: 'cat', label: 'Stray Cat' },
+    { x: 75, y: 25, type: 'dog', label: 'Injured Dog' },
+    { x: 35, y: 65, type: 'other', label: 'Stray Cattle' },
+    { x: 65, y: 70, type: 'cat', label: 'Kittens' },
+  ];
+
+  function addPin(x, y, type, label) {
+    const canvas = document.getElementById('map-canvas');
+    const pin = document.createElement('div');
+    pin.className = `map-pin pin-${type}`;
+    pin.style.left = x + '%';
+    pin.style.top = y + '%';
+    pin.innerHTML = `
+      <div class="pin-body">
+        <span class="pin-icon">${type === 'dog' ? '🐕' : type === 'cat' ? '🐈' : '🐾'}</span>
+      </div>
+      <div class="pin-label">${label}</div>
+    `;
+    canvas.appendChild(pin);
+  }
+
+  function initMap() {
+    defaultPins.forEach(p => addPin(p.x, p.y, p.type, p.label));
+    const canvas = document.getElementById('map-canvas');
+    canvas.addEventListener('click', function(e) {
+      if (e.target.closest('.map-pin') || e.target.closest('.map-legend') || e.target.closest('.map-controls') || e.target.closest('.map-click-hint')) return;
+      const rect = canvas.getBoundingClientRect();
+      const xPct = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const yPct = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      document.getElementById('location-input').value = `Pinned Location (${xPct}°N, ${yPct}°E)`;
+      openModal();
+    });
+  }
+
+  // MODAL
+  function openModal() {
+    document.getElementById('modal-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function selectType(btn) {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function selectUrgency(btn, level) {
+    document.querySelectorAll('.urgency-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function handlePhoto(input) {
+    if (input.files[0]) {
+      const el = input.closest('.photo-upload');
+      el.innerHTML = `<div style="font-size:2rem">✅</div><p><strong>${input.files[0].name}</strong></p><p>Photo ready to upload</p>`;
+    }
+  }
+
+  function submitReport() {
+    closeModal();
+    showToast();
+    // Add new pin to map
+    const x = 20 + Math.random() * 60;
+    const y = 20 + Math.random() * 60;
+    addPin(x.toFixed(1), y.toFixed(1), 'dog', 'New Report');
+    // Update count
+    const newCard = {
+      id: sampleReports.length + 1,
+      icon: '🐕',
+      type: 'dog',
+      title: 'New Stray Reported',
+      location: 'Your Location',
+      time: 'Just now',
+      status: 'pending',
+      votes: 0,
+      statusLabel: 'Pending',
+      color: '#E8DDD0'
+    };
+    sampleReports.unshift(newCard);
+    document.getElementById('report-count').textContent = sampleReports.length;
+    renderReports();
+  }
+
+  function govSubmit() {
+    showToast('🏛️ Municipality Registered! Our team will connect with you within 24 hours.');
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (msg) {
+      toast.querySelector('.toast-text strong').textContent = msg;
+      toast.querySelector('.toast-text span').textContent = '';
+    }
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); if(msg) {
+      toast.querySelector('.toast-text strong').textContent = 'Report Submitted!';
+      toast.querySelector('.toast-text span').textContent = 'Authorities have been notified. You\'ll get an update via SMS.';
+    }}, 4000);
+  }
+
+  // Animate stats counter
+  function animateCounter(el, target, suffix) {
+    let current = 0;
+    const step = target / 80;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current).toLocaleString() + (suffix || '');
+    }, 16);
+  }
+
+  // Init
+  renderReports();
+  initMap();
+
+  // Animate hero stats on load
+  setTimeout(() => {
+    animateCounter(document.getElementById('hero-reports'), 1247);
+  }, 800);
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+</body>
+</html>
