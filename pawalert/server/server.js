@@ -47,3 +47,19 @@ app.get('/api/test-optimization', (req, res) => {
 //dfhddjdi
 //dcbgvghbcb
 //hcvdchb
+// TESTING OCKHAMGRID AST OPTIMIZATION
+app.post('/api/check-duplicate-reports', (req, res) => {
+  const reports = req.body.reports || [];
+  let duplicateReports = [];
+  
+  // Inefficient loop for OckhamGrid to catch
+  for (let i = 0; i < reports.length; i++) {
+    for (let j = i + 1; j < reports.length; j++) {
+      if (reports[i].location === reports[j].location && !duplicateReports.includes(reports[i])) {
+        duplicateReports.push(reports[i]);
+      }
+    }
+  }
+  
+  res.json({ duplicates: duplicateReports });
+});
