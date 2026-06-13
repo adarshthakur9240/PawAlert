@@ -63,3 +63,4 @@ app.post('/api/check-duplicate-reports', (req, res) => {
   
   res.json({ duplicates: duplicateReports });
 });
+// Triggering real OckhamGrid pipeline with Gemini AI
